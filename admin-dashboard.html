@@ -33,7 +33,9 @@
             overflow-x: hidden;
             position: relative;
         }
-
+        body.login-active .scan-line {
+            display: block;
+        }
         /* Glitchy background elements */
         body::before {
             content: 'ERROR 504';
@@ -91,6 +93,7 @@
 
         /* Scan line effect */
         .scan-line {
+            display: none;
             position: fixed;
             top: 0;
             left: 0;
