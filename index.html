@@ -1124,15 +1124,17 @@
                 // Start timer - reset count after 2 seconds if no more clicks
                 clickTimer = setTimeout(() => {
                     clickCount = 0;
-                    // Reset styling
-                    this.style.letterSpacing = '0';
+                    // Reset all styling to default
+                    this.style.letterSpacing = '';
+                    this.style.color = '';
+                    this.style.transition = '';
                 }, 2000);
             }
             
             if (clickCount === 2) {
                 // Second click - increase letter spacing subtly
                 this.style.letterSpacing = '0.1em';
-                this.style.transition = 'letter-spacing 0.2s ease';
+                this.style.transition = 'letter-spacing 0.2s ease, color 0.2s ease';
             }
             
             if (clickCount === 3) {
@@ -1143,8 +1145,18 @@
                 this.style.letterSpacing = '0.3em';
                 this.style.color = 'var(--accent)';
                 
-                // Redirect to admin after brief delay
+                // Reset everything to default before redirect
                 setTimeout(() => {
+                    // Clear all inline styles
+                    this.style.letterSpacing = '';
+                    this.style.color = '';
+                    this.style.transition = '';
+                    this.style.animation = '';
+                    
+                    // Reset click count
+                    clickCount = 0;
+                    
+                    // Now redirect
                     window.location.href = 'admin-dashboard.html';
                 }, 400);
             }
@@ -1160,6 +1172,17 @@
             }
         `;
         document.head.appendChild(style);
+
+        // Ensure secret word styling is always reset on page load
+        window.addEventListener('load', function() {
+            const secretWord = document.getElementById('secretAccess');
+            if (secretWord) {
+                secretWord.style.letterSpacing = '';
+                secretWord.style.color = '';
+                secretWord.style.transition = '';
+                secretWord.style.animation = '';
+            }
+        });
 
         // Randomize hero image boxes
         function randomizeHeroBoxes() {
