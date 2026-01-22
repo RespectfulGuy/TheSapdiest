@@ -1114,13 +1114,14 @@
         function loadProducts() {
             const products = JSON.parse(localStorage.getItem('atelier_products') || '[]');
             const productGrid = document.getElementById('productGridInner');
-            const productSelect = document.getElementById('product');
+            
+            if (!productGrid) {
+                console.log('Product grid not ready yet');
+                return;
+            }
             
             // Clear existing products
             productGrid.innerHTML = '';
-            
-            // Clear and repopulate product dropdown
-            productSelect.innerHTML = '<option value="">Select a material...</option>';
             
             if (products.length === 0) {
                 productGrid.innerHTML = `
@@ -1167,19 +1168,7 @@
                 `;
                 
                 productGrid.appendChild(card);
-                
-                // Add to dropdown
-                const option = document.createElement('option');
-                option.value = product.name;
-                option.textContent = product.name;
-                productSelect.appendChild(option);
             });
-            
-            // Add "Other" option to dropdown
-            const otherOption = document.createElement('option');
-            otherOption.value = 'other';
-            otherOption.textContent = 'Other (specify in message)';
-            productSelect.appendChild(otherOption);
             
             // Re-apply fade-in observer
             document.querySelectorAll('.product-card.fade-in').forEach(el => observer.observe(el));
@@ -1189,7 +1178,9 @@
         }
         
         // Load products on page load
-        loadProducts();
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProducts();
+        });
         
         // Reload products every 10 seconds to catch admin updates
         setInterval(loadProducts, 10000);
@@ -1552,6 +1543,9 @@
                 }
             }, 500);
         }
+
+        // Make globally accessible
+        window.addToCart = addToCart;
 
         // Smooth scrolling for navigation
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
