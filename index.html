@@ -271,13 +271,26 @@
 
         .product-icon {
             width: 100%;
-            height: 180px;
+            height: 250px;
             background: var(--paper);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 3.5rem;
             border-bottom: 1px solid var(--border);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .product-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+
+        .product-card:hover .product-icon img {
+            transform: scale(1.05);
         }
         
         .product-card:hover .product-icon {
@@ -504,6 +517,15 @@
             margin-bottom: 1rem;
         }
 
+        .secret-access {
+            cursor: default;
+            user-select: none;
+        }
+
+        .secret-access:hover {
+            color: #666;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             header {
@@ -663,7 +685,7 @@
             <p>Premium architecture materials for UM6P SAP+D students</p>
             <p style="margin-top: 1rem;">We bridge the gap between you and the materials you need.</p>
         </div>
-        <p>&copy; 2026 ATELIER. Serving the architecture community at UM6P.</p>
+        <p>&copy; 2026 ATELIER. <span class="secret-access" id="secretAccess">Serving</span> the architecture community at UM6P.</p>
     </footer>
 
     <script>
@@ -998,6 +1020,119 @@
         
         // Run after cards are visible
         setTimeout(randomizeCards, 100);
+
+        // Load products dynamically from database
+        function loadProducts() {
+            const products = JSON.parse(localStorage.getItem('atelier_products') || '[]');
+            const productGrid = document.getElementById('productGridInner');
+            const productSelect = document.getElementById('product');
+            
+            // Clear existing products
+            productGrid.innerHTML = '';
+            
+            // Clear and repopulate product dropdown
+            productSelect.innerHTML = '<option value="">Select a material...</option>';
+            
+            if (products.length === 0) {
+                productGrid.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 4rem; color: #888;">
+                        <p>No products available yet. Check back soon!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Only show products with stock > 0
+            const availableProducts = products.filter(p => p.stock > 0);
+            
+            availableProducts.forEach(product => {
+                // Create product card
+                const card = document.createElement('div');
+                card.className = 'product-card fade-in';
+                
+                // Determine if we show image or icon
+                const iconContent = product.image 
+                    ? `<img src="${product.image}" alt="${product.name}" onerror="this.style.display='none'; this.parentElement.innerHTML='${product.icon || '📄'}';">`
+                    : (product.icon || '📄');
+                
+                // Build price display
+                const priceDisplay = product.price 
+                    ? product.price 
+                    : 'Available on request';
+                
+                // Stock indicator
+                const stockIndicator = product.stock <= product.minStock 
+                    ? `<span style="color: #ff4444; font-size: 0.85rem;">⚠️ Only ${product.stock} left</span>`
+                    : '';
+                
+                card.innerHTML = `
+                    <div class="product-icon">${iconContent}</div>
+                    <div style="padding: 1.5rem;">
+                        <h3>${product.name}</h3>
+                        ${product.specs ? `<p class="product-specs">${product.specs}</p>` : ''}
+                        <p class="product-description">${product.description || ''}</p>
+                        ${stockIndicator}
+                        <div class="product-price">${priceDisplay}</div>
+                        <button class="add-to-cart" onclick="addToCart('${product.name}')">ADD TO CART</button>
+                    </div>
+                `;
+                
+                productGrid.appendChild(card);
+                
+                // Add to dropdown
+                const option = document.createElement('option');
+                option.value = product.name;
+                option.textContent = product.name;
+                productSelect.appendChild(option);
+            });
+            
+            // Add "Other" option to dropdown
+            const otherOption = document.createElement('option');
+            otherOption.value = 'other';
+            otherOption.textContent = 'Other (specify in message)';
+            productSelect.appendChild(otherOption);
+            
+            // Re-apply fade-in observer
+            document.querySelectorAll('.product-card.fade-in').forEach(el => observer.observe(el));
+            
+            // Apply randomization after a short delay
+            setTimeout(randomizeCards, 200);
+        }
+        
+        // Load products on page load
+        loadProducts();
+        
+        // Reload products every 10 seconds to catch admin updates
+        setInterval(loadProducts, 10000);
+
+        // Secret admin access - triple click on "Serving" in footer
+        let clickCount = 0;
+        let clickTimer = null;
+        
+        document.getElementById('secretAccess').addEventListener('click', function() {
+            clickCount++;
+            
+            if (clickCount === 1) {
+                // Start timer - reset count after 2 seconds if no more clicks
+                clickTimer = setTimeout(() => {
+                    clickCount = 0;
+                }, 2000);
+            }
+            
+            if (clickCount === 3) {
+                // Triple clicked! Go to admin
+                clearTimeout(clickTimer);
+                clickCount = 0;
+                
+                // Subtle visual feedback
+                this.style.color = 'var(--accent)';
+                
+                // Redirect to admin after brief delay
+                setTimeout(() => {
+                    window.location.href = 'admin-dashboard.html';
+                }, 300);
+            }
+        });
 
         // Randomize hero image boxes
         function randomizeHeroBoxes() {
