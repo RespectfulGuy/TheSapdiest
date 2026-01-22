@@ -120,6 +120,7 @@ document.getElementById('loginForm')?.addEventListener('submit', function(e) {
 });
 
 function showDashboard() {
+    document.body.classList.remove('login-active');
     document.getElementById('loginContainer').style.display = 'none';
     document.getElementById('dashboard').classList.add('active');
     document.getElementById('currentUser').textContent = currentUser.name;
@@ -129,6 +130,7 @@ function showDashboard() {
 function logout() {
     sessionStorage.removeItem('atelier_session');
     currentUser = null;
+    document.body.classList.add('login-active');
     document.getElementById('loginContainer').style.display = 'flex';
     document.getElementById('dashboard').classList.remove('active');
     document.getElementById('loginForm').reset();
@@ -886,3 +888,4 @@ function deleteUser(userId) {
     db.saveData('users', users);
     loadUsersTable();
 }
+document.body.classList.add('login-active');
