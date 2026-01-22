@@ -14,8 +14,8 @@ class AtelierDB {
         // Initialize default data if not exists
         if (!localStorage.getItem('atelier_users')) {
             const defaultUsers = [
-                { id: 1, username: 'admin', password: 'atelier2026', role: 'admin', name: 'Admin User' },
-                { id: 2, username: 'staff', password: 'staff123', role: 'staff', name: 'Staff Member' }
+                { id: 1, username: 'admin', password: 'atelier2026', role: 'admin', name: 'Admin User', createdAt: new Date().toISOString() },
+                { id: 2, username: 'staff', password: 'staff123', role: 'staff', name: 'Staff Member', createdAt: new Date().toISOString() }
             ];
             this.saveData('users', defaultUsers);
         }
@@ -25,34 +25,43 @@ class AtelierDB {
                 {
                     id: 1,
                     name: 'Papier Plume 0.5',
+                    icon: '📐',
+                    image: null,
                     category: 'Paper',
                     stock: 50,
                     minStock: 10,
-                    price: null, // Set when needed
+                    price: null,
                     unit: 'sheets',
-                    description: 'Premium quality paper for detailed work',
+                    specs: 'Premium quality • Perfect for detailed work',
+                    description: 'Ultra-smooth paper ideal for precise technical drawings and ink work. Professional-grade quality favored by architects.',
                     createdAt: new Date().toISOString()
                 },
                 {
                     id: 2,
                     name: 'Papier Raisin 300g/m²',
+                    icon: '🎨',
+                    image: null,
                     category: 'Paper',
                     stock: 30,
                     minStock: 5,
                     price: null,
                     unit: 'sheets',
-                    description: 'Heavy weight watercolor ready paper',
+                    specs: 'Heavy weight • Watercolor ready',
+                    description: 'Thick, textured paper perfect for presentations, watercolor renderings, and high-quality final boards.',
                     createdAt: new Date().toISOString()
                 },
                 {
                     id: 3,
                     name: 'Papier Raisin 90g/m²',
+                    icon: '✏️',
+                    image: null,
                     category: 'Paper',
                     stock: 100,
                     minStock: 20,
                     price: null,
                     unit: 'sheets',
-                    description: 'Lightweight versatile paper',
+                    specs: 'Lightweight • Versatile',
+                    description: 'Everyday sketching and drafting paper. Perfect for iterative design work and study sketches.',
                     createdAt: new Date().toISOString()
                 }
             ];
@@ -180,6 +189,9 @@ function loadSectionData(section) {
             break;
         case 'analytics':
             loadAnalytics();
+            break;
+        case 'users':
+            loadUsersTable();
             break;
     }
 }
@@ -487,6 +499,15 @@ function editProduct(productId) {
                 <input type="text" class="input-field" id="productName" value="${product.name}" required>
             </div>
             <div class="form-group">
+                <label>Product Image URL</label>
+                <input type="text" class="input-field" id="productImage" value="${product.image || ''}" placeholder="https://example.com/image.jpg">
+                <small style="color: var(--text-secondary); font-size: 0.8rem;">Upload to imgur.com or use any image URL</small>
+            </div>
+            <div class="form-group">
+                <label>Icon/Emoji (if no image)</label>
+                <input type="text" class="input-field" id="productIcon" value="${product.icon || '📄'}" maxlength="2">
+            </div>
+            <div class="form-group">
                 <label>Category</label>
                 <input type="text" class="input-field" id="productCategory" value="${product.category}" required>
             </div>
@@ -499,11 +520,19 @@ function editProduct(productId) {
                 <input type="number" class="input-field" id="productMinStock" value="${product.minStock}" required>
             </div>
             <div class="form-group">
+                <label>Price (optional)</label>
+                <input type="text" class="input-field" id="productPrice" value="${product.price || ''}" placeholder="50 MAD or leave blank">
+            </div>
+            <div class="form-group">
                 <label>Unit</label>
                 <input type="text" class="input-field" id="productUnit" value="${product.unit}" required>
             </div>
             <div class="form-group">
-                <label>Description</label>
+                <label>Short Description</label>
+                <input type="text" class="input-field" id="productSpecs" value="${product.specs || ''}" placeholder="Premium quality • Perfect for detailed work">
+            </div>
+            <div class="form-group">
+                <label>Full Description</label>
                 <textarea class="input-field" id="productDescription" rows="3">${product.description}</textarea>
             </div>
             <button type="submit" class="action-btn primary" style="width: 100%;">Save Changes</button>
@@ -524,6 +553,15 @@ function openAddProductModal() {
                 <input type="text" class="input-field" id="productName" required>
             </div>
             <div class="form-group">
+                <label>Product Image URL</label>
+                <input type="text" class="input-field" id="productImage" placeholder="https://example.com/image.jpg">
+                <small style="color: var(--text-secondary); font-size: 0.8rem;">Upload to imgur.com or use any image URL</small>
+            </div>
+            <div class="form-group">
+                <label>Icon/Emoji (if no image)</label>
+                <input type="text" class="input-field" id="productIcon" value="📄" maxlength="2">
+            </div>
+            <div class="form-group">
                 <label>Category</label>
                 <input type="text" class="input-field" id="productCategory" value="Paper" required>
             </div>
@@ -536,11 +574,19 @@ function openAddProductModal() {
                 <input type="number" class="input-field" id="productMinStock" value="10" required>
             </div>
             <div class="form-group">
+                <label>Price (optional)</label>
+                <input type="text" class="input-field" id="productPrice" placeholder="50 MAD or leave blank">
+            </div>
+            <div class="form-group">
                 <label>Unit</label>
                 <input type="text" class="input-field" id="productUnit" value="sheets" required>
             </div>
             <div class="form-group">
-                <label>Description</label>
+                <label>Short Description (specs)</label>
+                <input type="text" class="input-field" id="productSpecs" placeholder="Premium quality • Perfect for detailed work">
+            </div>
+            <div class="form-group">
+                <label>Full Description</label>
                 <textarea class="input-field" id="productDescription" rows="3"></textarea>
             </div>
             <button type="submit" class="action-btn primary" style="width: 100%;">Add Product</button>
@@ -558,12 +604,15 @@ function saveProduct(event, productId = null) {
     
     const productData = {
         name: document.getElementById('productName').value,
+        image: document.getElementById('productImage').value || null,
+        icon: document.getElementById('productIcon').value || '📄',
         category: document.getElementById('productCategory').value,
         stock: parseInt(document.getElementById('productStock').value),
         minStock: parseInt(document.getElementById('productMinStock').value),
+        price: document.getElementById('productPrice').value || null,
         unit: document.getElementById('productUnit').value,
-        description: document.getElementById('productDescription').value,
-        price: null
+        specs: document.getElementById('productSpecs').value || '',
+        description: document.getElementById('productDescription').value
     };
     
     if (productId) {
@@ -650,4 +699,196 @@ function exportData(type) {
     link.href = url;
     link.download = `atelier_${type}_${new Date().toISOString().split('T')[0]}.json`;
     link.click();
+}
+
+// ============================================
+// USER MANAGEMENT (Secret Section)
+// ============================================
+
+// Secret access trigger - triple click on version number in sidebar
+let userAccessClicks = 0;
+let userAccessTimer = null;
+
+document.getElementById('secretTrigger')?.addEventListener('click', function(e) {
+    userAccessClicks++;
+    
+    if (userAccessClicks === 1) {
+        this.style.opacity = '0.5';
+        userAccessTimer = setTimeout(() => {
+            userAccessClicks = 0;
+            document.getElementById('secretTrigger').style.opacity = '0.3';
+        }, 2000);
+    }
+    
+    if (userAccessClicks === 2) {
+        this.style.opacity = '0.7';
+        this.style.color = 'var(--accent)';
+    }
+    
+    if (userAccessClicks === 3) {
+        clearTimeout(userAccessTimer);
+        userAccessClicks = 0;
+        
+        // Reveal user management section
+        const userNav = document.getElementById('userManagementNav');
+        userNav.style.display = 'block';
+        userNav.style.animation = 'fadeIn 0.5s ease';
+        
+        // Visual feedback
+        this.textContent = '🔓 v1.0';
+        this.style.color = 'var(--success)';
+        
+        // Flash the nav item
+        setTimeout(() => {
+            userNav.style.background = 'var(--accent-dim)';
+            setTimeout(() => {
+                userNav.style.background = '';
+            }, 500);
+        }, 100);
+    }
+});
+
+function loadUsersTable() {
+    const users = db.getData('users') || [];
+    
+    let html = '<table class="data-table"><thead><tr>';
+    html += '<th>ID</th><th>Username</th><th>Name</th><th>Role</th><th>Created</th><th>Actions</th>';
+    html += '</tr></thead><tbody>';
+    
+    users.forEach(user => {
+        const roleColor = user.role === 'admin' ? 'var(--accent)' : 'var(--text-secondary)';
+        html += `<tr>
+            <td>${user.id}</td>
+            <td><strong>${user.username}</strong></td>
+            <td>${user.name}</td>
+            <td style="color: ${roleColor}; text-transform: uppercase; font-weight: 600;">${user.role}</td>
+            <td>${user.createdAt ? new Date(user.createdAt).toLocaleDateString() : '—'}</td>
+            <td>
+                <button class="action-btn" onclick="editUser(${user.id})">Edit</button>
+                ${user.id > 2 ? `<button class="action-btn danger" onclick="deleteUser(${user.id})">Delete</button>` : ''}
+            </td>
+        </tr>`;
+    });
+    
+    html += '</tbody></table>';
+    document.getElementById('usersTable').innerHTML = html;
+}
+
+function openAddUserModal() {
+    document.getElementById('userModalTitle').textContent = 'Add New User';
+    
+    let html = `
+        <form id="userFormElement" onsubmit="saveUser(event)">
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" class="input-field" id="userUsername" required>
+            </div>
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" class="input-field" id="userName" required>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" class="input-field" id="userPassword" required>
+            </div>
+            <div class="form-group">
+                <label>Role</label>
+                <select class="input-field" id="userRole" required>
+                    <option value="staff">Staff</option>
+                    <option value="admin">Admin</option>
+                </select>
+            </div>
+            <button type="submit" class="action-btn primary" style="width: 100%;">Add User</button>
+        </form>
+    `;
+    
+    document.getElementById('userForm').innerHTML = html;
+    document.getElementById('userModal').classList.add('active');
+}
+
+function editUser(userId) {
+    const users = db.getData('users');
+    const user = users.find(u => u.id === userId);
+    
+    if (!user) return;
+    
+    document.getElementById('userModalTitle').textContent = 'Edit User';
+    
+    let html = `
+        <form id="userFormElement" onsubmit="saveUser(event, ${userId})">
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" class="input-field" id="userUsername" value="${user.username}" required>
+            </div>
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" class="input-field" id="userName" value="${user.name}" required>
+            </div>
+            <div class="form-group">
+                <label>New Password (leave blank to keep current)</label>
+                <input type="password" class="input-field" id="userPassword" placeholder="Leave blank to keep current">
+            </div>
+            <div class="form-group">
+                <label>Role</label>
+                <select class="input-field" id="userRole" required>
+                    <option value="staff" ${user.role === 'staff' ? 'selected' : ''}>Staff</option>
+                    <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
+                </select>
+            </div>
+            <button type="submit" class="action-btn primary" style="width: 100%;">Save Changes</button>
+        </form>
+    `;
+    
+    document.getElementById('userForm').innerHTML = html;
+    document.getElementById('userModal').classList.add('active');
+}
+
+function saveUser(event, userId = null) {
+    event.preventDefault();
+    
+    const users = db.getData('users');
+    
+    const userData = {
+        username: document.getElementById('userUsername').value,
+        name: document.getElementById('userName').value,
+        role: document.getElementById('userRole').value
+    };
+    
+    const password = document.getElementById('userPassword').value;
+    
+    if (userId) {
+        // Update existing user
+        const index = users.findIndex(u => u.id === userId);
+        users[index] = { 
+            ...users[index], 
+            ...userData, 
+            ...(password ? { password } : {}),
+            updatedAt: new Date().toISOString() 
+        };
+    } else {
+        // Add new user
+        if (!password) {
+            alert('Password is required for new users');
+            return;
+        }
+        userData.id = db.generateId('users');
+        userData.password = password;
+        userData.createdAt = new Date().toISOString();
+        users.push(userData);
+    }
+    
+    db.saveData('users', users);
+    closeModal('userModal');
+    loadUsersTable();
+}
+
+function deleteUser(userId) {
+    if (!confirm('Are you sure you want to delete this user? This cannot be undone.')) {
+        return;
+    }
+    
+    let users = db.getData('users');
+    users = users.filter(u => u.id !== userId);
+    db.saveData('users', users);
+    loadUsersTable();
 }
