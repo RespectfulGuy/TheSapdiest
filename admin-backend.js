@@ -15,7 +15,6 @@ class AtelierDB {
         if (!localStorage.getItem('atelier_users')) {
             const defaultUsers = [
                 { id: 1, username: 'admin', password: 'atelier2026', role: 'admin', name: 'Admin User', createdAt: new Date().toISOString() },
-                { id: 2, username: 'staff', password: 'staff123', role: 'staff', name: 'Staff Member', createdAt: new Date().toISOString() }
             ];
             this.saveData('users', defaultUsers);
         }
