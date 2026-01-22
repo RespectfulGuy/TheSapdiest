@@ -1201,16 +1201,14 @@
         let orderItems = [];
         let itemCounter = 0;
 
-        // Add first item on page load
-        window.addEventListener('load', function() {
-            setTimeout(() => {
-                addOrderItem();
-            }, 500);
-        });
-
         function addOrderItem() {
             const itemId = itemCounter++;
             const itemsContainer = document.getElementById('itemsList');
+            
+            if (!itemsContainer) {
+                console.error('itemsList container not found!');
+                return;
+            }
             
             const itemDiv = document.createElement('div');
             itemDiv.className = 'order-item';
@@ -1243,6 +1241,14 @@
             setupAutocomplete(itemId);
         }
 
+        // Add first item when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Wait a moment for everything to settle
+            setTimeout(() => {
+                addOrderItem();
+            }, 100);
+        });
+
         function removeOrderItem(itemId) {
             const itemDiv = document.getElementById(`order-item-${itemId}`);
             if (itemDiv) {
@@ -1251,10 +1257,14 @@
             
             // Make sure at least one item remains
             const itemsList = document.getElementById('itemsList');
-            if (itemsList.children.length === 0) {
+            if (itemsList && itemsList.children.length === 0) {
                 addOrderItem();
             }
         }
+
+        // Make functions globally accessible
+        window.addOrderItem = addOrderItem;
+        window.removeOrderItem = removeOrderItem;
 
         function setupAutocomplete(itemId) {
             const input = document.getElementById(`material-${itemId}`);
@@ -1320,57 +1330,71 @@
         let clickCount = 0;
         let clickTimer = null;
         
-        const secretWord = document.getElementById('secretAccess');
-        
-        secretWord.addEventListener('click', function() {
-            clickCount++;
+        // Wait for DOM to be ready
+        document.addEventListener('DOMContentLoaded', function() {
+            const secretWord = document.getElementById('secretAccess');
             
-            if (clickCount === 1) {
-                // First click - very subtle shake
-                this.style.animation = 'subtleShake 0.3s ease';
-                setTimeout(() => {
-                    this.style.animation = '';
-                }, 300);
-                
-                // Start timer - reset count after 2 seconds if no more clicks
-                clickTimer = setTimeout(() => {
-                    clickCount = 0;
-                    // Reset all styling to default
-                    this.style.letterSpacing = '';
-                    this.style.color = '';
-                    this.style.transition = '';
-                }, 2000);
+            if (!secretWord) {
+                console.error('Secret access element not found!');
+                return;
             }
             
-            if (clickCount === 2) {
-                // Second click - increase letter spacing subtly
-                this.style.letterSpacing = '0.1em';
-                this.style.transition = 'letter-spacing 0.2s ease, color 0.2s ease';
-            }
-            
-            if (clickCount === 3) {
-                // Triple clicked! Go to admin
-                clearTimeout(clickTimer);
+            secretWord.addEventListener('click', function() {
+                clickCount++;
                 
-                // Subtle visual feedback - more spacing and color shift
-                this.style.letterSpacing = '0.3em';
-                this.style.color = 'var(--accent)';
-                
-                // Reset everything to default before redirect
-                setTimeout(() => {
-                    // Clear all inline styles
-                    this.style.letterSpacing = '';
-                    this.style.color = '';
-                    this.style.transition = '';
-                    this.style.animation = '';
+                if (clickCount === 1) {
+                    // First click - very subtle shake
+                    this.style.animation = 'subtleShake 0.3s ease';
+                    setTimeout(() => {
+                        this.style.animation = '';
+                    }, 300);
                     
-                    // Reset click count
-                    clickCount = 0;
+                    // Start timer - reset count after 2 seconds if no more clicks
+                    clickTimer = setTimeout(() => {
+                        clickCount = 0;
+                        // Reset all styling to default
+                        this.style.letterSpacing = '';
+                        this.style.color = '';
+                        this.style.transition = '';
+                    }, 2000);
+                }
+                
+                if (clickCount === 2) {
+                    // Second click - increase letter spacing subtly
+                    this.style.letterSpacing = '0.1em';
+                    this.style.transition = 'letter-spacing 0.2s ease, color 0.2s ease';
+                }
+                
+                if (clickCount === 3) {
+                    // Triple clicked! Go to admin
+                    clearTimeout(clickTimer);
                     
-                    // Now redirect
-                    window.location.href = 'admin-dashboard.html';
-                }, 400);
-            }
+                    // Subtle visual feedback - more spacing and color shift
+                    this.style.letterSpacing = '0.3em';
+                    this.style.color = 'var(--accent)';
+                    
+                    // Reset everything to default before redirect
+                    setTimeout(() => {
+                        // Clear all inline styles
+                        this.style.letterSpacing = '';
+                        this.style.color = '';
+                        this.style.transition = '';
+                        this.style.animation = '';
+                        
+                        // Reset click count
+                        clickCount = 0;
+                        
+                        // Now redirect
+                        window.location.href = 'admin-dashboard.html';
+                    }, 400);
+                }
+            });
+            
+            // Reset styling on load
+            secretWord.style.letterSpacing = '';
+            secretWord.style.color = '';
+            secretWord.style.transition = '';
+            secretWord.style.animation = '';
         });
         
         // Add subtle shake animation
@@ -1383,17 +1407,6 @@
             }
         `;
         document.head.appendChild(style);
-
-        // Ensure secret word styling is always reset on page load
-        window.addEventListener('load', function() {
-            const secretWord = document.getElementById('secretAccess');
-            if (secretWord) {
-                secretWord.style.letterSpacing = '';
-                secretWord.style.color = '';
-                secretWord.style.transition = '';
-                secretWord.style.animation = '';
-            }
-        });
 
         // Randomize hero image boxes
         function randomizeHeroBoxes() {
