@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATELIER — Architecture Materials for UM6P SAP+D</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Work+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ink: #1a1a1a;
+            --paper: #f8f6f0;
+            --accent: #d4a574;
+            --shadow: rgba(0, 0, 0, 0.08);
+            --border: #e0ddd5;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Work Sans', sans-serif;
+            background: var(--paper);
+            color: var(--ink);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 2rem 4rem;
+            background: rgba(248, 246, 240, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideDown 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+            }
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: var(--ink);
+        }
+
+        nav a {
+            margin-left: 2.5rem;
+            text-decoration: none;
+            color: var(--ink);
+            font-weight: 400;
+            font-size: 0.95rem;
+            letter-spacing: 0.02em;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        nav a:hover {
+            color: var(--accent);
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--accent);
+            transition: width 0.3s ease;
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            margin-top: 100px;
+            padding: 6rem 4rem 4rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            min-height: 70vh;
+        }
+
+        .hero-text {
+            animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 4.5rem;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+
+        .hero .subtitle {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 2rem;
+            font-weight: 300;
+        }
+
+        .hero .tagline {
+            font-size: 1rem;
+            margin-bottom: 3rem;
+            max-width: 500px;
+            color: #555;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            background: var(--ink);
+            color: var(--paper);
+            text-decoration: none;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            transition: all 0.3s ease;
+            border: 2px solid var(--ink);
+        }
+
+        .cta-button:hover {
+            background: transparent;
+            color: var(--ink);
+            transform: translateY(-2px);
+        }
+
+        .hero-image {
+            position: relative;
+            height: 600px;
+            animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
+        }
+
+        .hero-image-box {
+            position: absolute;
+            background: #e8e5dc;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .hero-image-box:nth-child(1) {
+            width: 300px;
+            height: 400px;
+            top: 0;
+            right: 100px;
+            z-index: 2;
+        }
+
+        .hero-image-box:nth-child(2) {
+            width: 250px;
+            height: 350px;
+            bottom: 50px;
+            right: 0;
+            z-index: 1;
+        }
+
+        .hero-image-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+
+        .hero-image-box:hover img {
+            transform: scale(1.05);
+        }
+
+        /* Products Section */
+        .products {
+            padding: 6rem 4rem;
+            background: white;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+            animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .section-header h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+            padding: 2rem 4rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .product-grid-inner {
+            display: contents;
+        }
+
+        .product-card {
+            background: white;
+            border: 1px solid var(--border);
+            padding: 0;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transform-style: preserve-3d;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+        
+
+
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(212, 165, 116, 0.1), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .product-card:hover::before {
+            left: 100%;
+        }
+
+
+
+        .product-icon {
+            width: 100%;
+            height: 180px;
+            background: var(--paper);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .product-card:hover .product-icon {
+            background: #f0ede5;
+        }
+
+        .product-card h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            margin-bottom: 0.5rem;
+            padding: 1.5rem 1.5rem 0;
+        }
+
+        .product-specs {
+            color: #888;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+            padding: 0 1.5rem;
+        }
+
+        .product-description {
+            margin-bottom: 1.5rem;
+            color: #555;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            padding: 0 1.5rem;
+            flex-grow: 1;
+        }
+
+        .product-price {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+            padding: 0 1.5rem;
+        }
+
+        .add-to-cart {
+            width: 100%;
+            padding: 1rem;
+            background: var(--ink);
+            color: white;
+            border: none;
+            border-top: 1px solid var(--border);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            transition: all 0.3s ease;
+            font-family: 'Work Sans', sans-serif;
+            margin-top: auto;
+        }
+
+        .add-to-cart:hover {
+            background: var(--accent);
+            color: var(--ink);
+        }
+
+        /* Custom Order Section */
+        .custom-order {
+            padding: 6rem 4rem;
+            background: var(--ink);
+            color: var(--paper);
+        }
+
+        .custom-order h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .order-form {
+            max-width: 700px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 3rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--paper);
+            font-family: 'Work Sans', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .form-group textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .submit-button {
+            width: 100%;
+            padding: 1.2rem;
+            background: var(--accent);
+            color: var(--ink);
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            transition: all 0.3s ease;
+            font-family: 'Work Sans', sans-serif;
+        }
+
+        .submit-button:hover {
+            background: var(--paper);
+            transform: translateY(-2px);
+        }
+
+        /* Order Confirmation Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--paper);
+            padding: 3rem;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid var(--border);
+            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-content h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal-content p {
+            margin-bottom: 1rem;
+            color: #555;
+        }
+
+        .modal-close {
+            margin-top: 2rem;
+            padding: 1rem 2rem;
+            background: var(--ink);
+            color: var(--paper);
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            width: 100%;
+        }
+
+        /* Footer */
+        footer {
+            padding: 4rem 4rem 2rem;
+            background: white;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+
+        footer p {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .footer-info {
+            margin-bottom: 2rem;
+        }
+
+        .footer-info h4 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header {
+                padding: 1.5rem 2rem;
+            }
+
+            nav {
+                display: none;
+            }
+
+            .hero {
+                grid-template-columns: 1fr;
+                padding: 4rem 2rem;
+            }
+
+            .hero h1 {
+                font-size: 3rem;
+            }
+
+            .hero-image {
+                height: 400px;
+            }
+
+            .products {
+                padding: 4rem 2rem;
+            }
+
+            .section-header h2 {
+                font-size: 2.5rem;
+            }
+
+            .custom-order {
+                padding: 4rem 2rem;
+            }
+
+            .order-form {
+                padding: 2rem;
+            }
+        }
+
+        /* Scroll animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">ATELIER</div>
+        <nav>
+            <a href="#products">Products</a>
+            <a href="#custom">Custom Orders</a>
+            <a href="#about">About</a>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="hero-text">
+            <h1>Premium Materials for Architecture Students</h1>
+            <p class="subtitle">UM6P SAP+D</p>
+            <p class="tagline">From sketch to final presentation, we provide the essential materials that bring your architectural visions to life.</p>
+            <a href="#products" class="cta-button">EXPLORE MATERIALS</a>
+        </div>
+        <div class="hero-image">
+            <div class="hero-image-box">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 500'%3E%3Crect fill='%23e8e5dc' width='400' height='500'/%3E%3Cpath d='M50 50 L350 50 L350 450 L50 450 Z' fill='none' stroke='%23d4a574' stroke-width='2'/%3E%3Cline x1='100' y1='150' x2='300' y2='150' stroke='%23bbb' stroke-width='1'/%3E%3Cline x1='100' y1='200' x2='300' y2='200' stroke='%23bbb' stroke-width='1'/%3E%3Cline x1='100' y1='250' x2='300' y2='250' stroke='%23bbb' stroke-width='1'/%3E%3C/svg%3E" alt="Architecture sketch">
+            </div>
+            <div class="hero-image-box">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 350 450'%3E%3Crect fill='%23f0ede5' width='350' height='450'/%3E%3Ccircle cx='175' cy='225' r='80' fill='none' stroke='%23d4a574' stroke-width='3'/%3E%3Cpath d='M100 100 L250 100 L250 350 L100 350 Z' fill='none' stroke='%23ccc' stroke-width='1' stroke-dasharray='5,5'/%3E%3C/svg%3E" alt="Design tools">
+            </div>
+        </div>
+    </section>
+
+    <section id="products" class="products">
+        <div class="section-header fade-in">
+            <h2>Essential Materials</h2>
+            <p>Curated selection for architecture students</p>
+        </div>
+
+        <div class="product-grid" id="productGrid">
+            <div class="product-grid-inner" id="productGridInner">
+                <!-- Products will be dynamically loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <section id="custom" class="custom-order">
+        <h2>Custom Order Request</h2>
+        <form class="order-form" id="orderForm">
+            <div class="form-group">
+                <label for="name">Your Name</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone" required>
+            </div>
+
+            <div class="form-group">
+                <label for="product">Material Needed</label>
+                <select id="product" name="product" required>
+                    <option value="">Select a material...</option>
+                    <!-- Options will be dynamically populated from database -->
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="quantity">Quantity</label>
+                <input type="number" id="quantity" name="quantity" min="1" required>
+            </div>
+
+            <div class="form-group">
+                <label for="pickup">Preferred Pickup Location</label>
+                <select id="pickup" name="pickup" required>
+                    <option value="">Select location...</option>
+                    <option value="campus">On Campus</option>
+                    <option value="office">Our Office</option>
+                    <option value="delivery">Delivery (specify in message)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="message">Additional Details</label>
+                <textarea id="message" name="message" placeholder="Specify any special requirements, custom materials, or additional information..."></textarea>
+            </div>
+
+            <button type="submit" class="submit-button">SUBMIT ORDER REQUEST</button>
+        </form>
+    </section>
+
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <h3>Order Received!</h3>
+            <p>Thank you for your order request. We've received your information and will contact you shortly with:</p>
+            <p>• Price confirmation<br>• Expected delivery/pickup time<br>• Payment details</p>
+            <p>You'll receive an email at <span id="confirmEmail"></span> within 24 hours.</p>
+            <button class="modal-close" onclick="closeModal()">CLOSE</button>
+        </div>
+    </div>
+
+    <footer id="about">
+        <div class="footer-info">
+            <h4>ATELIER</h4>
+            <p>Premium architecture materials for UM6P SAP+D students</p>
+            <p style="margin-top: 1rem;">We bridge the gap between you and the materials you need.</p>
+        </div>
+        <p>&copy; 2026 ATELIER. Serving the architecture community at UM6P.</p>
+    </footer>
+
+    <script>
+        // ============================================
+        // DATABASE - Add/Edit products here
+        // ============================================
+        const productsDatabase = [
+            {
+                name: "Papier Plume 0.5",
+                icon: "📐",
+                specs: "Premium quality • Perfect for detailed work",
+                description: "Ultra-smooth paper ideal for precise technical drawings and ink work. Professional-grade quality favored by architects.",
+                price: "Available on request"
+            },
+            {
+                name: "Papier Raisin 300g/m²",
+                icon: "🎨",
+                specs: "Heavy weight • Watercolor ready",
+                description: "Thick, textured paper perfect for presentations, watercolor renderings, and high-quality final boards.",
+                price: "Available on request"
+            },
+            {
+                name: "Papier Raisin 90g/m²",
+                icon: "✏️",
+                specs: "Lightweight • Versatile",
+                description: "Everyday sketching and drafting paper. Perfect for iterative design work and study sketches.",
+                price: "Available on request"
+            },
+            {
+                name: "Tracing Paper Roll",
+                icon: "📜",
+                specs: "Transparent • 50m length",
+                description: "Professional tracing paper for overlay work and iterative design processes. Essential for concept development.",
+                price: "Available on request"
+            },
+            {
+                name: "Bristol Board A3",
+                icon: "🖼️",
+                specs: "250g/m² • Smooth finish",
+                description: "Heavy-duty board perfect for presentation mounts, model bases, and final presentation boards.",
+                price: "Available on request"
+            },
+            {
+                name: "Foam Core 5mm",
+                icon: "⬜",
+                specs: "Lightweight • A1 size",
+                description: "Premium foam core boards for architectural models and presentations. Clean cuts, professional finish.",
+                price: "Available on request"
+            },
+            {
+                name: "Balsa Wood Sheets",
+                icon: "🪵",
+                specs: "Various thicknesses • 1-5mm",
+                description: "High-quality balsa wood for architectural model making. Easy to cut and shape.",
+                price: "Available on request"
+            },
+            {
+                name: "Cutting Mat A2",
+                icon: "🔲",
+                specs: "Self-healing • Grid printed",
+                description: "Professional cutting surface with metric grid. Protects your workspace and ensures precise cuts.",
+                price: "Available on request"
+            },
+            {
+                name: "Precision Knife Set",
+                icon: "🔪",
+                specs: "X-Acto compatible • Extra blades",
+                description: "Professional craft knives with replaceable blades. Essential for model making and precision work.",
+                price: "Available on request"
+            },
+            {
+                name: "Architectural Scale Ruler",
+                icon: "📏",
+                specs: "Triangular • Multiple scales",
+                description: "Professional triangular scale ruler with standard architectural scales. Aluminum construction.",
+                price: "Available on request"
+            },
+            {
+                name: "Technical Pens Set",
+                icon: "🖊️",
+                specs: "0.1 - 0.8mm • Waterproof ink",
+                description: "High-quality technical drawing pens with consistent line weights. Perfect for hand drafting.",
+                price: "Available on request"
+            },
+            {
+                name: "Drafting Tape",
+                icon: "📋",
+                specs: "Low-tack • 25mm width",
+                description: "Gentle adhesive tape that won't damage your drawings. Essential for securing work to drawing boards.",
+                price: "Available on request"
+            },
+            {
+                name: "Chipboard 2mm",
+                icon: "📄",
+                specs: "Dense • Model grade",
+                description: "Heavy chipboard ideal for structural model components and presentation bases.",
+                price: "Available on request"
+            },
+            {
+                name: "Illustration Board",
+                icon: "🎯",
+                specs: "Hot press • A3 size",
+                description: "Museum-grade illustration board for final renderings and presentation artwork.",
+                price: "Available on request"
+            },
+            {
+                name: "Graph Paper Pad",
+                icon: "⊞",
+                specs: "5mm grid • 50 sheets",
+                description: "Professional graph paper for quick sketches, diagrams, and technical planning.",
+                price: "Available on request"
+            },
+            {
+                name: "Vellum Paper",
+                icon: "📃",
+                specs: "Translucent • 100g/m²",
+                description: "High-quality vellum for overlay drawings and presentation work with a professional finish.",
+                price: "Available on request"
+            },
+            {
+                name: "Acrylic Sheets",
+                icon: "💎",
+                specs: "Clear • 2-3mm thickness",
+                description: "Laser-cut ready acrylic sheets for contemporary architectural models and presentations.",
+                price: "Available on request"
+            },
+            {
+                name: "Cork Sheets",
+                icon: "🟫",
+                specs: "3mm thick • Natural finish",
+                description: "Natural cork material for model bases, textures, and sustainable design projects.",
+                price: "Available on request"
+            },
+            {
+                name: "Mounting Spray",
+                icon: "💨",
+                specs: "Repositionable • 400ml",
+                description: "Professional adhesive spray for mounting prints and creating presentation boards.",
+                price: "Available on request"
+            },
+            {
+                name: "Marker Paper Pad",
+                icon: "🎨",
+                specs: "Bleed-proof • A4 size",
+                description: "Specialized paper that prevents marker bleed-through. Ideal for rendering and concept sketches.",
+                price: "Available on request"
+            },
+            {
+                name: "Basswood Strips",
+                icon: "🌲",
+                specs: "1x3mm • Bundle of 20",
+                description: "Fine basswood strips for detailed structural models and framework.",
+                price: "Available on request"
+            },
+            {
+                name: "Transfer Paper",
+                icon: "📋",
+                specs: "Graphite coated • A4 sheets",
+                description: "Transfer complex drawings to final presentation surfaces with precision.",
+                price: "Available on request"
+            },
+            {
+                name: "Cardstock Variety Pack",
+                icon: "🎴",
+                specs: "180g/m² • Assorted colors",
+                description: "Colored cardstock for diagrams, concept models, and presentation elements.",
+                price: "Available on request"
+            },
+            {
+                name: "Watercolor Paper",
+                icon: "🌊",
+                specs: "300g/m² • Cold press",
+                description: "Artist-grade watercolor paper for architectural renderings and perspective drawings.",
+                price: "Available on request"
+            },
+            {
+                name: "Black Foam Board",
+                icon: "⬛",
+                specs: "5mm • A2 size",
+                description: "Professional black foam board for dramatic presentations and exhibition displays.",
+                price: "Available on request"
+            },
+            {
+                name: "Sketch Pad Wire-bound",
+                icon: "📓",
+                specs: "120g/m² • 100 sheets",
+                description: "Quality sketch pad with wire binding that lays flat. Perfect for ideation and development work.",
+                price: "Available on request"
+            },
+            {
+                name: "Modeling Clay",
+                icon: "🏺",
+                specs: "Non-hardening • 500g",
+                description: "Professional modeling clay for massing studies and topographic models.",
+                price: "Available on request"
+            },
+            {
+                name: "Clear Acetate Sheets",
+                icon: "🔳",
+                specs: "0.5mm • A3 size",
+                description: "Transparent sheets for overlay diagrams, presentation layers, and glazing details.",
+                price: "Available on request"
+            },
+            {
+                name: "Colored Pencil Set",
+                icon: "🖍️",
+                specs: "Professional grade • 24 colors",
+                description: "High-quality colored pencils for rendering, shading, and presentation drawings.",
+                price: "Available on request"
+            },
+            {
+                name: "White Glue",
+                icon: "🧴",
+                specs: "PVA • 250ml",
+                description: "Professional-grade white glue for paper, cardboard, and wood. Dries clear.",
+                price: "Available on request"
+            }
+        ];
+
+        // ============================================
+        // Dynamic Product Loading
+        // ============================================
+        function loadProducts() {
+            const productGridInner = document.getElementById('productGridInner');
+            productGridInner.innerHTML = ''; // Clear existing products
+
+            productsDatabase.forEach((product, index) => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card fade-in';
+                productCard.style.animationDelay = `${index * 0.05}s`;
+                
+                productCard.innerHTML = `
+                    <div class="product-icon">${product.icon}</div>
+                    <h3>${product.name}</h3>
+                    <p class="product-specs">${product.specs}</p>
+                    <p class="product-description">${product.description}</p>
+                    <div class="product-price">${product.price}</div>
+                    <button class="add-to-cart" onclick="addToCart('${product.name}')">ADD TO CART</button>
+                `;
+                
+                productGridInner.appendChild(productCard);
+            });
+
+            // Populate form dropdown with products
+            const productSelect = document.getElementById('product');
+            productsDatabase.forEach(product => {
+                const option = document.createElement('option');
+                option.value = product.name;
+                option.textContent = product.name;
+                productSelect.appendChild(option);
+            });
+            
+            // Add "Other" option at the end
+            const otherOption = document.createElement('option');
+            otherOption.value = 'other';
+            otherOption.textContent = 'Other (specify in message)';
+            productSelect.appendChild(otherOption);
+
+            // Re-observe new elements for scroll animations
+            document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+        }
+
+        // Load products when page loads
+        window.addEventListener('DOMContentLoaded', loadProducts);
+
+        // ============================================
+        // Scroll animations
+        // ============================================
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+        // Randomize product cards for visual interest
+        function randomizeCards() {
+            const cards = document.querySelectorAll('.product-card');
+            
+            cards.forEach((card, index) => {
+                // Random tilt between -2 and 2 degrees
+                const tiltX = (Math.random() - 0.5) * 4;
+                const tiltY = (Math.random() - 0.5) * 4;
+                
+                // Random position offsets (-15 to +15 pixels)
+                const offsetX = (Math.random() - 0.5) * 30;
+                const offsetY = (Math.random() - 0.5) * 30;
+                
+                // Random shadow depth (larger = more depth)
+                const shadowDepth = 15 + Math.random() * 25; // 15-40px
+                const shadowBlur = 20 + Math.random() * 30; // 20-50px
+                const shadowOpacity = 0.08 + Math.random() * 0.12; // 0.08-0.20
+                
+                // Random dimension adjustments (-20 to +20 pixels)
+                const widthAdjust = Math.floor((Math.random() - 0.5) * 40);
+                const heightAdjust = Math.floor((Math.random() - 0.5) * 40);
+                
+                // Apply styles with position offset
+                card.style.transform = `translate(${offsetX}px, ${offsetY}px) rotate(${tiltX}deg) rotateY(${tiltY}deg)`;
+                card.style.boxShadow = `0 ${shadowDepth}px ${shadowBlur}px rgba(0, 0, 0, ${shadowOpacity})`;
+                
+                // Adjust card dimensions slightly
+                const baseWidth = card.offsetWidth;
+                const baseHeight = card.offsetHeight;
+                card.style.width = `calc(100% + ${widthAdjust}px)`;
+                card.style.minHeight = `${baseHeight + heightAdjust}px`;
+                
+                // Store original transform for hover effect
+                card.dataset.originalTransform = card.style.transform;
+                card.dataset.originalShadow = card.style.boxShadow;
+                
+                // Enhanced hover effect with tilt and position
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = `translate(${offsetX}px, ${offsetY - 8}px) rotate(${tiltX}deg) rotateY(${tiltY}deg) scale(1.02)`;
+                    this.style.boxShadow = `0 ${shadowDepth + 10}px ${shadowBlur + 10}px rgba(0, 0, 0, ${shadowOpacity + 0.05})`;
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = this.dataset.originalTransform;
+                    this.style.boxShadow = this.dataset.originalShadow;
+                });
+            });
+        }
+        
+        // Run after cards are visible
+        setTimeout(randomizeCards, 100);
+
+        // Randomize hero image boxes
+        function randomizeHeroBoxes() {
+            const boxes = document.querySelectorAll('.hero-image-box');
+            
+            boxes.forEach(box => {
+                // Subtle tilt for hero images
+                const tilt = (Math.random() - 0.5) * 6; // -3 to +3 degrees
+                
+                // Random position offsets
+                const offsetX = (Math.random() - 0.5) * 40; // -20 to +20px
+                const offsetY = (Math.random() - 0.5) * 40;
+                
+                const shadowDepth = 10 + Math.random() * 20;
+                const shadowBlur = 30 + Math.random() * 20;
+                
+                box.style.transform = `translate(${offsetX}px, ${offsetY}px) rotate(${tilt}deg)`;
+                box.style.boxShadow = `0 ${shadowDepth}px ${shadowBlur}px rgba(0, 0, 0, 0.15)`;
+                
+                // Store for hover
+                box.dataset.originalTransform = box.style.transform;
+            });
+        }
+        
+        setTimeout(randomizeHeroBoxes, 200);
+
+        // Form submission
+        document.getElementById('orderForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            
+            // Get existing orders or initialize empty array
+            const orders = JSON.parse(localStorage.getItem('atelier_orders') || '[]');
+            
+            // Create new order object
+            const newOrder = {
+                id: orders.length > 0 ? Math.max(...orders.map(o => o.id)) + 1 : 1,
+                customerName: formData.get('name'),
+                email: formData.get('email'),
+                phone: formData.get('phone'),
+                productName: formData.get('product'),
+                quantity: parseInt(formData.get('quantity')),
+                pickup: formData.get('pickup'),
+                message: formData.get('message'),
+                status: 'pending',
+                createdAt: new Date().toISOString()
+            };
+            
+            // Add to orders array
+            orders.push(newOrder);
+            
+            // Save to localStorage
+            localStorage.setItem('atelier_orders', JSON.stringify(orders));
+            
+            console.log('Order submitted:', newOrder);
+            
+            // Show confirmation modal
+            document.getElementById('confirmEmail').textContent = formData.get('email');
+            document.getElementById('confirmModal').classList.add('active');
+            
+            // Reset form
+            e.target.reset();
+        });
+
+        function closeModal() {
+            document.getElementById('confirmModal').classList.remove('active');
+        }
+
+        function addToCart(productName) {
+            // Scroll to custom order form
+            document.getElementById('custom').scrollIntoView({ behavior: 'smooth' });
+            
+            // Pre-fill the product selection
+            setTimeout(() => {
+                document.getElementById('product').value = productName;
+                document.getElementById('product').focus();
+            }, 500);
+        }
+
+        // Smooth scrolling for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
