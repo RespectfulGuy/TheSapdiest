@@ -112,7 +112,7 @@ document.getElementById('loginForm')?.addEventListener('submit', function(e) {
     
     if (user) {
         currentUser = user;
-        sessionStorage.setItem('atelier_session', JSON.stringify(user));
+        // Don't save to sessionStorage - require login every time
         showDashboard();
     } else {
         document.getElementById('loginError').style.display = 'block';
@@ -134,14 +134,8 @@ function logout() {
     document.getElementById('loginForm').reset();
 }
 
-// Check for existing session on load
-window.addEventListener('load', function() {
-    const session = sessionStorage.getItem('atelier_session');
-    if (session) {
-        currentUser = JSON.parse(session);
-        showDashboard();
-    }
-});
+// DO NOT check for existing session - always require login
+// Removed auto-login on page load
 
 // ============================================
 // NAVIGATION
