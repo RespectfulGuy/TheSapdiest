@@ -120,7 +120,6 @@ document.getElementById('loginForm')?.addEventListener('submit', function(e) {
 });
 
 function showDashboard() {
-    document.body.classList.remove('login-active');
     document.getElementById('loginContainer').style.display = 'none';
     document.getElementById('dashboard').classList.add('active');
     document.getElementById('currentUser').textContent = currentUser.name;
@@ -130,7 +129,6 @@ function showDashboard() {
 function logout() {
     sessionStorage.removeItem('atelier_session');
     currentUser = null;
-    document.body.classList.add('login-active');
     document.getElementById('loginContainer').style.display = 'flex';
     document.getElementById('dashboard').classList.remove('active');
     document.getElementById('loginForm').reset();
@@ -210,18 +208,25 @@ function loadRecentOrders() {
     const recentOrders = orders.slice(-5).reverse(); // Last 5 orders
     
     let html = '<table class="data-table"><thead><tr>';
-    html += '<th>Order ID</th><th>Customer</th><th>Product</th><th>Quantity</th><th>Status</th><th>Date</th><th>Actions</th>';
+    html += '<th>Order ID</th><th>Customer</th><th>Items</th><th>Status</th><th>Date</th><th>Actions</th>';
     html += '</tr></thead><tbody>';
     
     if (recentOrders.length === 0) {
-        html += '<tr><td colspan="7" style="text-align: center; color: var(--text-secondary); padding: 2rem;">No orders yet</td></tr>';
+        html += '<tr><td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 2rem;">No orders yet</td></tr>';
     } else {
         recentOrders.forEach(order => {
+            // Handle both old (single item) and new (multiple items) format
+            let itemsDisplay = '';
+            if (order.items && Array.isArray(order.items)) {
+                itemsDisplay = order.items.map(item => `${item.quantity}x ${item.material}`).join(', ');
+            } else if (order.productName) {
+                itemsDisplay = `${order.quantity}x ${order.productName}`;
+            }
+            
             html += `<tr>
                 <td>#${order.id}</td>
                 <td>${order.customerName}</td>
-                <td>${order.productName}</td>
-                <td>${order.quantity}</td>
+                <td style="max-width: 300px;">${itemsDisplay}</td>
                 <td><span class="status-badge status-${order.status}">${order.status}</span></td>
                 <td>${new Date(order.createdAt).toLocaleDateString()}</td>
                 <td><button class="action-btn" onclick="viewOrderDetails(${order.id})">View</button></td>
@@ -243,20 +248,27 @@ function loadOrdersTable() {
     }
     
     let html = '<table class="data-table"><thead><tr>';
-    html += '<th>ID</th><th>Customer</th><th>Email</th><th>Phone</th><th>Product</th><th>Qty</th><th>Pickup</th><th>Status</th><th>Date</th><th>Actions</th>';
+    html += '<th>ID</th><th>Customer</th><th>Email</th><th>Phone</th><th>Items</th><th>Pickup</th><th>Status</th><th>Date</th><th>Actions</th>';
     html += '</tr></thead><tbody>';
     
     if (filteredOrders.length === 0) {
-        html += '<tr><td colspan="10" style="text-align: center; color: var(--text-secondary); padding: 2rem;">No orders found</td></tr>';
+        html += '<tr><td colspan="9" style="text-align: center; color: var(--text-secondary); padding: 2rem;">No orders found</td></tr>';
     } else {
         filteredOrders.reverse().forEach(order => {
+            // Handle both old and new format
+            let itemsDisplay = '';
+            if (order.items && Array.isArray(order.items)) {
+                itemsDisplay = order.items.map(item => `${item.quantity}x ${item.material}`).join(', ');
+            } else if (order.productName) {
+                itemsDisplay = `${order.quantity}x ${order.productName}`;
+            }
+            
             html += `<tr>
                 <td>#${order.id}</td>
                 <td>${order.customerName}</td>
                 <td>${order.email}</td>
                 <td>${order.phone}</td>
-                <td>${order.productName}</td>
-                <td>${order.quantity}</td>
+                <td style="max-width: 300px;">${itemsDisplay}</td>
                 <td>${order.pickup}</td>
                 <td><span class="status-badge status-${order.status}">${order.status}</span></td>
                 <td>${new Date(order.createdAt).toLocaleDateString()}</td>
@@ -291,6 +303,7 @@ function loadInventoryTable() {
             <td>
                 <button class="action-btn" onclick="editProduct(${product.id})">Edit</button>
                 <button class="action-btn" onclick="adjustStock(${product.id})">Adjust Stock</button>
+                <button class="action-btn danger" onclick="deleteProduct(${product.id})">Delete</button>
             </td>
         </tr>`;
     });
@@ -386,6 +399,30 @@ function viewOrderDetails(orderId) {
     
     if (!order) return;
     
+    // Handle both old and new format
+    let itemsHTML = '';
+    if (order.items && Array.isArray(order.items)) {
+        itemsHTML = `
+            <div>
+                <p style="color: var(--text-secondary); font-size: 0.85rem;">ITEMS ORDERED</p>
+                <ul style="margin-top: 0.5rem; padding-left: 1.2rem;">
+                    ${order.items.map(item => `<li>${item.quantity}x ${item.material}</li>`).join('')}
+                </ul>
+            </div>
+        `;
+    } else if (order.productName) {
+        itemsHTML = `
+            <div>
+                <p style="color: var(--text-secondary); font-size: 0.85rem;">PRODUCT</p>
+                <p>${order.productName}</p>
+            </div>
+            <div>
+                <p style="color: var(--text-secondary); font-size: 0.85rem;">QUANTITY</p>
+                <p>${order.quantity}</p>
+            </div>
+        `;
+    }
+    
     let html = `
         <div style="margin-bottom: 1.5rem;">
             <p style="color: var(--text-secondary); margin-bottom: 0.5rem;">ORDER #${order.id}</p>
@@ -401,14 +438,7 @@ function viewOrderDetails(orderId) {
                 <p style="color: var(--text-secondary); font-size: 0.85rem;">PHONE</p>
                 <p>${order.phone}</p>
             </div>
-            <div>
-                <p style="color: var(--text-secondary); font-size: 0.85rem;">PRODUCT</p>
-                <p>${order.productName}</p>
-            </div>
-            <div>
-                <p style="color: var(--text-secondary); font-size: 0.85rem;">QUANTITY</p>
-                <p>${order.quantity}</p>
-            </div>
+            ${itemsHTML}
             <div>
                 <p style="color: var(--text-secondary); font-size: 0.85rem;">PICKUP LOCATION</p>
                 <p>${order.pickup}</p>
@@ -645,6 +675,18 @@ function adjustStock(productId) {
             loadOverviewStats();
         }
     }
+}
+
+function deleteProduct(productId) {
+    if (!confirm('Are you sure you want to delete this product? This cannot be undone.')) {
+        return;
+    }
+    
+    let products = db.getData('products');
+    products = products.filter(p => p.id !== productId);
+    db.saveData('products', products);
+    loadInventoryTable();
+    loadOverviewStats();
 }
 
 function updateProductStock(productName, quantityChange) {
@@ -888,4 +930,3 @@ function deleteUser(userId) {
     db.saveData('users', users);
     loadUsersTable();
 }
-document.body.classList.add('login-active');
