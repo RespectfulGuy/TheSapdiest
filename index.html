@@ -408,6 +408,99 @@
             resize: vertical;
         }
 
+        .add-item-btn {
+            width: 100%;
+            padding: 0.8rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px dashed rgba(255, 255, 255, 0.3);
+            color: var(--paper);
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-family: 'Work Sans', sans-serif;
+            margin-top: 1rem;
+        }
+
+        .add-item-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: var(--accent);
+        }
+
+        .order-item {
+            display: grid;
+            grid-template-columns: 80px 1fr auto;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .order-item input[type="number"] {
+            width: 100%;
+        }
+
+        .order-item .item-input-wrapper {
+            position: relative;
+        }
+
+        .order-item input[type="text"] {
+            width: 100%;
+        }
+
+        .item-warning {
+            font-size: 0.75rem;
+            color: #ffaa00;
+            margin-top: 0.3rem;
+            display: none;
+        }
+
+        .item-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--ink);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+        }
+
+        .suggestion-item {
+            padding: 0.8rem;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .suggestion-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .remove-item-btn {
+            background: transparent;
+            border: 1px solid rgba(255, 68, 68, 0.5);
+            color: #ff4444;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+            height: fit-content;
+        }
+
+        .remove-item-btn:hover {
+            background: #ff4444;
+            color: white;
+        }
+
         .submit-button {
             width: 100%;
             padding: 1.2rem;
@@ -638,19 +731,6 @@
             </div>
 
             <div class="form-group">
-                <label for="product">Material Needed</label>
-                <select id="product" name="product" required>
-                    <option value="">Select a material...</option>
-                    <!-- Options will be dynamically populated from database -->
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="quantity">Quantity</label>
-                <input type="number" id="quantity" name="quantity" min="1" required>
-            </div>
-
-            <div class="form-group">
                 <label for="pickup">Preferred Pickup Location</label>
                 <select id="pickup" name="pickup" required>
                     <option value="">Select location...</option>
@@ -660,9 +740,17 @@
                 </select>
             </div>
 
+            <div class="form-group" style="margin-top: 2rem;">
+                <label>I Need:</label>
+                <div id="itemsList">
+                    <!-- Items will be added here -->
+                </div>
+                <button type="button" class="add-item-btn" onclick="addOrderItem()">+ Add Item</button>
+            </div>
+
             <div class="form-group">
                 <label for="message">Additional Details</label>
-                <textarea id="message" name="message" placeholder="Specify any special requirements, custom materials, or additional information..."></textarea>
+                <textarea id="message" name="message" placeholder="Specify any special requirements or additional information..."></textarea>
             </div>
 
             <button type="submit" class="submit-button">SUBMIT ORDER REQUEST</button>
@@ -686,6 +774,7 @@
             <p style="margin-top: 1rem;">We bridge the gap between you and the materials you need.</p>
         </div>
         <p>&copy; 2026 ATELIER. <span class="secret-access" id="secretAccess">Serving</span> the architecture community at UM6P.</p>
+        <p style="margin-top: 1rem;"><a href="terms.html" style="color: #888; text-decoration: none; font-size: 0.85rem;">Terms & Conditions</a></p>
     </footer>
 
     <script>
@@ -1105,6 +1194,128 @@
         // Reload products every 10 seconds to catch admin updates
         setInterval(loadProducts, 10000);
 
+        // ============================================
+        // MULTIPLE ITEMS ORDER SYSTEM
+        // ============================================
+
+        let orderItems = [];
+        let itemCounter = 0;
+
+        // Add first item on page load
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                addOrderItem();
+            }, 500);
+        });
+
+        function addOrderItem() {
+            const itemId = itemCounter++;
+            const itemsContainer = document.getElementById('itemsList');
+            
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'order-item';
+            itemDiv.id = `order-item-${itemId}`;
+            
+            itemDiv.innerHTML = `
+                <input type="number" 
+                       class="input-field" 
+                       placeholder="Qty" 
+                       min="1" 
+                       value="1"
+                       id="qty-${itemId}"
+                       required>
+                <div class="item-input-wrapper">
+                    <input type="text" 
+                           class="input-field" 
+                           placeholder="Material needed..." 
+                           id="material-${itemId}"
+                           autocomplete="off"
+                           required>
+                    <div class="item-suggestions" id="suggestions-${itemId}"></div>
+                    <div class="item-warning" id="warning-${itemId}">⚠️ Item not in stock - we'll check availability</div>
+                </div>
+                <button type="button" class="remove-item-btn" onclick="removeOrderItem(${itemId})">Remove</button>
+            `;
+            
+            itemsContainer.appendChild(itemDiv);
+            
+            // Setup autocomplete
+            setupAutocomplete(itemId);
+        }
+
+        function removeOrderItem(itemId) {
+            const itemDiv = document.getElementById(`order-item-${itemId}`);
+            if (itemDiv) {
+                itemDiv.remove();
+            }
+            
+            // Make sure at least one item remains
+            const itemsList = document.getElementById('itemsList');
+            if (itemsList.children.length === 0) {
+                addOrderItem();
+            }
+        }
+
+        function setupAutocomplete(itemId) {
+            const input = document.getElementById(`material-${itemId}`);
+            const suggestionsDiv = document.getElementById(`suggestions-${itemId}`);
+            const warningDiv = document.getElementById(`warning-${itemId}`);
+            
+            input.addEventListener('input', function() {
+                const query = this.value.toLowerCase().trim();
+                
+                if (query.length < 1) {
+                    suggestionsDiv.style.display = 'none';
+                    warningDiv.style.display = 'none';
+                    return;
+                }
+                
+                const products = JSON.parse(localStorage.getItem('atelier_products') || '[]');
+                const availableProducts = products.filter(p => p.stock > 0);
+                
+                const matches = availableProducts.filter(p => 
+                    p.name.toLowerCase().includes(query)
+                );
+                
+                if (matches.length > 0) {
+                    suggestionsDiv.innerHTML = '';
+                    matches.forEach(product => {
+                        const suggestionItem = document.createElement('div');
+                        suggestionItem.className = 'suggestion-item';
+                        suggestionItem.textContent = `${product.name} (${product.stock} available)`;
+                        suggestionItem.onclick = () => {
+                            input.value = product.name;
+                            suggestionsDiv.style.display = 'none';
+                            warningDiv.style.display = 'none';
+                        };
+                        suggestionsDiv.appendChild(suggestionItem);
+                    });
+                    suggestionsDiv.style.display = 'block';
+                    warningDiv.style.display = 'none';
+                } else {
+                    suggestionsDiv.style.display = 'none';
+                    
+                    // Check if exact match exists in any product
+                    const exactMatch = products.find(p => 
+                        p.name.toLowerCase() === query
+                    );
+                    
+                    if (!exactMatch && query.length > 2) {
+                        warningDiv.style.display = 'block';
+                    } else {
+                        warningDiv.style.display = 'none';
+                    }
+                }
+            });
+            
+            // Close suggestions when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!input.contains(e.target)) {
+                    suggestionsDiv.style.display = 'none';
+                }
+            });
+        }
+
         // Secret admin access - triple click on "Serving" in footer
         let clickCount = 0;
         let clickTimer = null;
@@ -1215,6 +1426,28 @@
             
             const formData = new FormData(e.target);
             
+            // Collect all items
+            const items = [];
+            const itemsContainer = document.getElementById('itemsList');
+            const orderItems = itemsContainer.querySelectorAll('.order-item');
+            
+            orderItems.forEach(itemDiv => {
+                const qtyInput = itemDiv.querySelector('input[type="number"]');
+                const materialInput = itemDiv.querySelector('input[type="text"]');
+                
+                if (qtyInput && materialInput && materialInput.value.trim()) {
+                    items.push({
+                        material: materialInput.value.trim(),
+                        quantity: parseInt(qtyInput.value) || 1
+                    });
+                }
+            });
+            
+            if (items.length === 0) {
+                alert('Please add at least one item to your order');
+                return;
+            }
+            
             // Get existing orders or initialize empty array
             const orders = JSON.parse(localStorage.getItem('atelier_orders') || '[]');
             
@@ -1224,8 +1457,7 @@
                 customerName: formData.get('name'),
                 email: formData.get('email'),
                 phone: formData.get('phone'),
-                productName: formData.get('product'),
-                quantity: parseInt(formData.get('quantity')),
+                items: items,
                 pickup: formData.get('pickup'),
                 message: formData.get('message'),
                 status: 'pending',
@@ -1240,12 +1472,30 @@
             
             console.log('Order submitted:', newOrder);
             
+            // Send email notification (console for now - you'll need to set up email service)
+            console.log('📧 EMAIL NOTIFICATION:');
+            console.log('To: your-email@atelier.com');
+            console.log('Subject: New Order #' + newOrder.id);
+            console.log('Customer:', newOrder.customerName);
+            console.log('Items:', items.map(i => `${i.quantity}x ${i.material}`).join(', '));
+            console.log('---');
+            
+            // Show browser notification if permission granted
+            if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification('New ATELIER Order!', {
+                    body: `Order #${newOrder.id} from ${newOrder.customerName}`,
+                    icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="75" font-size="75">📦</text></svg>'
+                });
+            }
+            
             // Show confirmation modal
             document.getElementById('confirmEmail').textContent = formData.get('email');
             document.getElementById('confirmModal').classList.add('active');
             
             // Reset form
             e.target.reset();
+            document.getElementById('itemsList').innerHTML = '';
+            addOrderItem();
         });
 
         function closeModal() {
@@ -1256,10 +1506,37 @@
             // Scroll to custom order form
             document.getElementById('custom').scrollIntoView({ behavior: 'smooth' });
             
-            // Pre-fill the product selection
+            // Wait for scroll, then add item with pre-filled product
             setTimeout(() => {
-                document.getElementById('product').value = productName;
-                document.getElementById('product').focus();
+                // Check if there's an empty item field first
+                const itemsContainer = document.getElementById('itemsList');
+                const emptyItem = Array.from(itemsContainer.querySelectorAll('.order-item')).find(item => {
+                    const materialInput = item.querySelector('input[type="text"]');
+                    return materialInput && !materialInput.value.trim();
+                });
+                
+                if (emptyItem) {
+                    // Use existing empty item
+                    const materialInput = emptyItem.querySelector('input[type="text"]');
+                    materialInput.value = productName;
+                    materialInput.focus();
+                } else {
+                    // Add new item
+                    const currentCount = itemsContainer.children.length;
+                    addOrderItem();
+                    
+                    // Fill the newly added item
+                    setTimeout(() => {
+                        const newItem = itemsContainer.children[currentCount];
+                        if (newItem) {
+                            const materialInput = newItem.querySelector('input[type="text"]');
+                            if (materialInput) {
+                                materialInput.value = productName;
+                                materialInput.focus();
+                            }
+                        }
+                    }, 100);
+                }
             }, 500);
         }
 
