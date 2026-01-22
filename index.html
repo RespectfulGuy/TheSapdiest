@@ -1109,30 +1109,57 @@
         let clickCount = 0;
         let clickTimer = null;
         
-        document.getElementById('secretAccess').addEventListener('click', function() {
+        const secretWord = document.getElementById('secretAccess');
+        
+        secretWord.addEventListener('click', function() {
             clickCount++;
             
             if (clickCount === 1) {
+                // First click - very subtle shake
+                this.style.animation = 'subtleShake 0.3s ease';
+                setTimeout(() => {
+                    this.style.animation = '';
+                }, 300);
+                
                 // Start timer - reset count after 2 seconds if no more clicks
                 clickTimer = setTimeout(() => {
                     clickCount = 0;
+                    // Reset styling
+                    this.style.letterSpacing = '0';
                 }, 2000);
+            }
+            
+            if (clickCount === 2) {
+                // Second click - increase letter spacing subtly
+                this.style.letterSpacing = '0.1em';
+                this.style.transition = 'letter-spacing 0.2s ease';
             }
             
             if (clickCount === 3) {
                 // Triple clicked! Go to admin
                 clearTimeout(clickTimer);
-                clickCount = 0;
                 
-                // Subtle visual feedback
+                // Subtle visual feedback - more spacing and color shift
+                this.style.letterSpacing = '0.3em';
                 this.style.color = 'var(--accent)';
                 
                 // Redirect to admin after brief delay
                 setTimeout(() => {
                     window.location.href = 'admin-dashboard.html';
-                }, 300);
+                }, 400);
             }
         });
+        
+        // Add subtle shake animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes subtleShake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-1px); }
+                75% { transform: translateX(1px); }
+            }
+        `;
+        document.head.appendChild(style);
 
         // Randomize hero image boxes
         function randomizeHeroBoxes() {
