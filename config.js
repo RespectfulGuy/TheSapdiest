@@ -13,7 +13,7 @@ const GITHUB_CONFIG = {
     // Your GitHub Personal Access Token
     // Generate at: https://github.com/settings/tokens
     // Required scopes: 'repo' (Full control of private repositories)
-    token: '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',
+    token: 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,
     
     // Path to registry file in your repo
     registryPath: 'registry.json',
