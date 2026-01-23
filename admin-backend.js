@@ -14,58 +14,14 @@ class AtelierDB {
         // Initialize default data if not exists
         if (!localStorage.getItem('atelier_users')) {
             const defaultUsers = [
-                { id: 1, username: 'admin', password: 'atelier2026', role: 'admin', name: 'Admin User', createdAt: new Date().toISOString() },
-                { id: 2, username: 'staff', password: 'staff123', role: 'staff', name: 'Staff Member', createdAt: new Date().toISOString() }
+                { id: 1, username: 'admin', password: 'atelier2026', role: 'admin', name: 'Admin User', createdAt: new Date().toISOString() }
             ];
             this.saveData('users', defaultUsers);
         }
 
         if (!localStorage.getItem('atelier_products')) {
-            const defaultProducts = [
-                {
-                    id: 1,
-                    name: 'Papier Plume 0.5',
-                    icon: '📐',
-                    image: null,
-                    category: 'Paper',
-                    stock: 50,
-                    minStock: 10,
-                    price: null,
-                    unit: 'sheets',
-                    specs: 'Premium quality • Perfect for detailed work',
-                    description: 'Ultra-smooth paper ideal for precise technical drawings and ink work. Professional-grade quality favored by architects.',
-                    createdAt: new Date().toISOString()
-                },
-                {
-                    id: 2,
-                    name: 'Papier Raisin 300g/m²',
-                    icon: '🎨',
-                    image: null,
-                    category: 'Paper',
-                    stock: 30,
-                    minStock: 5,
-                    price: null,
-                    unit: 'sheets',
-                    specs: 'Heavy weight • Watercolor ready',
-                    description: 'Thick, textured paper perfect for presentations, watercolor renderings, and high-quality final boards.',
-                    createdAt: new Date().toISOString()
-                },
-                {
-                    id: 3,
-                    name: 'Papier Raisin 90g/m²',
-                    icon: '✏️',
-                    image: null,
-                    category: 'Paper',
-                    stock: 100,
-                    minStock: 20,
-                    price: null,
-                    unit: 'sheets',
-                    specs: 'Lightweight • Versatile',
-                    description: 'Everyday sketching and drafting paper. Perfect for iterative design work and study sketches.',
-                    createdAt: new Date().toISOString()
-                }
-            ];
-            this.saveData('products', defaultProducts);
+            // Start with empty products - admin will add them
+            this.saveData('products', []);
         }
 
         if (!localStorage.getItem('atelier_orders')) {
@@ -82,21 +38,18 @@ class AtelierDB {
                     id: 1,
                     text: "Architecture is the learned game, correct and magnificent, of forms assembled in the light.",
                     author: "Le Corbusier",
-                    active: true,
                     createdAt: new Date().toISOString()
                 },
                 {
                     id: 2,
                     text: "Form follows function.",
                     author: "Louis Sullivan",
-                    active: false,
                     createdAt: new Date().toISOString()
                 },
                 {
                     id: 3,
                     text: "Less is more.",
                     author: "Ludwig Mies van der Rohe",
-                    active: false,
                     createdAt: new Date().toISOString()
                 }
             ];
@@ -969,28 +922,29 @@ function loadQuotesTable() {
     const quotes = db.getData('quotes') || [];
     
     let html = '<table class="data-table"><thead><tr>';
-    html += '<th>ID</th><th>Quote</th><th>Author</th><th>Status</th><th>Actions</th>';
+    html += '<th>ID</th><th>Quote</th><th>Author</th><th>Actions</th>';
     html += '</tr></thead><tbody>';
     
     quotes.forEach(quote => {
-        const statusBadge = quote.active 
-            ? '<span class="status-badge status-ready">ACTIVE</span>'
-            : '<span class="status-badge status-pending">INACTIVE</span>';
-        
         html += `<tr>
             <td>${quote.id}</td>
-            <td style="max-width: 400px;">${quote.text}</td>
+            <td style="max-width: 500px;">${quote.text}</td>
             <td>${quote.author}</td>
-            <td>${statusBadge}</td>
             <td>
                 <button class="action-btn" onclick="editQuote(${quote.id})">Edit</button>
-                <button class="action-btn ${quote.active ? '' : 'primary'}" onclick="toggleQuote(${quote.id})">${quote.active ? 'Deactivate' : 'Activate'}</button>
                 <button class="action-btn danger" onclick="deleteQuote(${quote.id})">Delete</button>
             </td>
         </tr>`;
     });
     
     html += '</tbody></table>';
+    
+    if (quotes.length > 0) {
+        html += `<p style="margin-top: 1rem; color: var(--text-secondary); font-size: 0.9rem;">
+            💡 Quotes are randomly displayed on the store and change every 10 seconds
+        </p>`;
+    }
+    
     document.getElementById('quotesTable').innerHTML = html;
 }
 
@@ -1006,12 +960,6 @@ function openAddQuoteModal() {
             <div class="form-group">
                 <label>Author</label>
                 <input type="text" class="input-field" id="quoteAuthor" required>
-            </div>
-            <div class="form-group">
-                <label>
-                    <input type="checkbox" id="quoteActive" style="width: auto; margin-right: 0.5rem;">
-                    Set as active quote
-                </label>
             </div>
             <button type="submit" class="action-btn primary" style="width: 100%;">Add Quote</button>
         </form>
@@ -1039,12 +987,6 @@ function editQuote(quoteId) {
                 <label>Author</label>
                 <input type="text" class="input-field" id="quoteAuthor" value="${quote.author}" required>
             </div>
-            <div class="form-group">
-                <label>
-                    <input type="checkbox" id="quoteActive" ${quote.active ? 'checked' : ''} style="width: auto; margin-right: 0.5rem;">
-                    Set as active quote
-                </label>
-            </div>
             <button type="submit" class="action-btn primary" style="width: 100%;">Save Changes</button>
         </form>
     `;
@@ -1059,12 +1001,6 @@ function saveQuote(event, quoteId = null) {
     const quotes = db.getData('quotes');
     const text = document.getElementById('quoteText').value;
     const author = document.getElementById('quoteAuthor').value;
-    const active = document.getElementById('quoteActive').checked;
-    
-    // If setting as active, deactivate all others
-    if (active) {
-        quotes.forEach(q => q.active = false);
-    }
     
     if (quoteId) {
         // Update existing quote
@@ -1072,8 +1008,7 @@ function saveQuote(event, quoteId = null) {
         quotes[index] = { 
             ...quotes[index], 
             text, 
-            author, 
-            active,
+            author,
             updatedAt: new Date().toISOString() 
         };
     } else {
@@ -1082,7 +1017,6 @@ function saveQuote(event, quoteId = null) {
             id: db.generateId('quotes'),
             text,
             author,
-            active,
             createdAt: new Date().toISOString()
         };
         quotes.push(newQuote);
@@ -1090,24 +1024,6 @@ function saveQuote(event, quoteId = null) {
     
     db.saveData('quotes', quotes);
     closeModal('quoteModal');
-    loadQuotesTable();
-}
-
-function toggleQuote(quoteId) {
-    const quotes = db.getData('quotes');
-    const quote = quotes.find(q => q.id === quoteId);
-    
-    if (!quote) return;
-    
-    // If activating, deactivate all others
-    if (!quote.active) {
-        quotes.forEach(q => q.active = false);
-    }
-    
-    quote.active = !quote.active;
-    quote.updatedAt = new Date().toISOString();
-    
-    db.saveData('quotes', quotes);
     loadQuotesTable();
 }
 
