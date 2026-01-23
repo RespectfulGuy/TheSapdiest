@@ -204,6 +204,102 @@
             background: white;
         }
 
+        /* Quote Section */
+        .quote-section {
+            padding: 6rem 4rem;
+            background: linear-gradient(135deg, #f8f6f0 0%, #f0ede5 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quote-section::before {
+            content: '"';
+            position: absolute;
+            top: -50px;
+            left: 5%;
+            font-size: 20rem;
+            font-family: 'Playfair Display', serif;
+            color: rgba(212, 165, 116, 0.08);
+            line-height: 1;
+            pointer-events: none;
+        }
+
+        .quote-container {
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .quote-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            line-height: 1.4;
+            color: var(--ink);
+            margin-bottom: 2rem;
+            font-weight: 400;
+            font-style: italic;
+            position: relative;
+        }
+
+        .quote-text::first-letter {
+            font-size: 4rem;
+            font-weight: 700;
+            color: var(--accent);
+            float: left;
+            line-height: 0.8;
+            margin: 0.1em 0.1em 0 0;
+        }
+
+        .quote-author {
+            font-family: 'Work Sans', sans-serif;
+            font-size: 1.1rem;
+            color: #888;
+            font-weight: 300;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            position: relative;
+            display: inline-block;
+        }
+
+        .quote-author::before {
+            content: '';
+            position: absolute;
+            left: -80px;
+            top: 50%;
+            width: 60px;
+            height: 1px;
+            background: var(--accent);
+        }
+
+        .quote-author::after {
+            content: '';
+            position: absolute;
+            right: -80px;
+            top: 50%;
+            width: 60px;
+            height: 1px;
+            background: var(--accent);
+        }
+
+        @media (max-width: 768px) {
+            .quote-text {
+                font-size: 1.8rem;
+            }
+
+            .quote-text::first-letter {
+                font-size: 3rem;
+            }
+
+            .quote-author::before,
+            .quote-author::after {
+                width: 30px;
+                left: -40px;
+                right: -40px;
+            }
+        }
+
         .section-header {
             text-align: center;
             margin-bottom: 4rem;
@@ -408,38 +504,31 @@
             resize: vertical;
         }
 
-        .add-item-btn {
-            width: 100%;
-            padding: 0.8rem;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px dashed rgba(255, 255, 255, 0.3);
-            color: var(--paper);
-            cursor: pointer;
-            font-size: 0.95rem;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            font-family: 'Work Sans', sans-serif;
-            margin-top: 1rem;
-        }
-
-        .add-item-btn:hover {
-            background: rgba(255, 255, 255, 0.12);
-            border-color: var(--accent);
+        /* Order items container */
+        .items-container {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 1.5rem;
+            border-radius: 4px;
+            min-height: 200px;
         }
 
         .order-item {
             display: grid;
-            grid-template-columns: 80px 1fr auto;
+            grid-template-columns: 70px 1fr 40px;
             gap: 1rem;
-            margin-bottom: 1rem;
-            padding: 1rem;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            position: relative;
+            margin-bottom: 0.8rem;
+            align-items: center;
         }
 
         .order-item input[type="number"] {
             width: 100%;
+            padding: 0.8rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--paper);
+            font-family: 'Work Sans', sans-serif;
+            font-size: 1rem;
         }
 
         .order-item .item-input-wrapper {
@@ -448,6 +537,20 @@
 
         .order-item input[type="text"] {
             width: 100%;
+            padding: 0.8rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--paper);
+            font-family: 'Work Sans', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .order-item input[type="number"]:focus,
+        .order-item input[type="text"]:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: rgba(255, 255, 255, 0.12);
         }
 
         .item-warning {
@@ -455,6 +558,9 @@
             color: #ffaa00;
             margin-top: 0.3rem;
             display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
         }
 
         .item-suggestions {
@@ -468,6 +574,7 @@
             overflow-y: auto;
             z-index: 100;
             display: none;
+            margin-top: 0.3rem;
         }
 
         .suggestion-item {
@@ -487,18 +594,41 @@
 
         .remove-item-btn {
             background: transparent;
-            border: 1px solid rgba(255, 68, 68, 0.5);
-            color: #ff4444;
-            padding: 0.5rem 1rem;
+            border: none;
+            color: rgba(255, 68, 68, 0.7);
             cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.85rem;
-            height: fit-content;
+            font-size: 1.5rem;
+            transition: all 0.2s ease;
+            padding: 0;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
         }
 
         .remove-item-btn:hover {
-            background: #ff4444;
-            color: white;
+            color: #ff4444;
+            transform: scale(1.2);
+        }
+
+        .add-item-btn {
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+            font-size: 0.85rem;
+            padding: 0.8rem;
+            text-align: center;
+            transition: all 0.2s ease;
+            font-family: 'Work Sans', sans-serif;
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+
+        .add-item-btn:hover {
+            color: var(--accent);
         }
 
         .submit-button {
@@ -699,6 +829,13 @@
         </div>
     </section>
 
+    <!-- Quote Section -->
+    <section class="quote-section">
+        <div class="quote-container" id="quoteContainer">
+            <!-- Quote will be loaded here -->
+        </div>
+    </section>
+
     <section id="products" class="products">
         <div class="section-header fade-in">
             <h2>Essential Materials</h2>
@@ -742,10 +879,12 @@
 
             <div class="form-group" style="margin-top: 2rem;">
                 <label>I Need:</label>
-                <div id="itemsList">
-                    <!-- Items will be added here -->
+                <div class="items-container">
+                    <div id="itemsList">
+                        <!-- Items will be added here -->
+                    </div>
+                    <button type="button" class="add-item-btn" onclick="addOrderItem()">+ Add Item</button>
                 </div>
-                <button type="button" class="add-item-btn" onclick="addOrderItem()">+ Add Item</button>
             </div>
 
             <div class="form-group">
@@ -772,9 +911,9 @@
             <h4>ATELIER</h4>
             <p>Premium architecture materials for UM6P SAP+D students</p>
             <p style="margin-top: 1rem;">We bridge the gap between you and the materials you need.</p>
+            <p style="margin-top: 1.5rem;"><a href="terms.html" style="color: #888; text-decoration: none; font-size: 0.85rem; transition: color 0.3s ease;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='#888'">Terms & Conditions</a></p>
         </div>
         <p>&copy; 2026 ATELIER. <span class="secret-access" id="secretAccess">Serving</span> the architecture community at UM6P.</p>
-        <p style="margin-top: 1rem;"><a href="terms.html" style="color: #888; text-decoration: none; font-size: 0.85rem;">Terms & Conditions</a></p>
     </footer>
 
     <script>
@@ -1180,10 +1319,37 @@
         // Load products on page load
         document.addEventListener('DOMContentLoaded', function() {
             loadProducts();
+            loadQuote();
         });
         
         // Reload products every 10 seconds to catch admin updates
         setInterval(loadProducts, 10000);
+
+        // Load and display active quote
+        function loadQuote() {
+            const quotes = JSON.parse(localStorage.getItem('atelier_quotes') || '[]');
+            const activeQuote = quotes.find(q => q.active);
+            
+            const quoteContainer = document.getElementById('quoteContainer');
+            
+            if (!quoteContainer) return;
+            
+            if (activeQuote) {
+                quoteContainer.innerHTML = `
+                    <p class="quote-text">${activeQuote.text}</p>
+                    <p class="quote-author">— ${activeQuote.author}</p>
+                `;
+            } else {
+                // Default quote if none active
+                quoteContainer.innerHTML = `
+                    <p class="quote-text">Architecture is the learned game, correct and magnificent, of forms assembled in the light.</p>
+                    <p class="quote-author">— Le Corbusier</p>
+                `;
+            }
+        }
+
+        // Reload quote every 30 seconds to catch admin updates
+        setInterval(loadQuote, 30000);
 
         // ============================================
         // MULTIPLE ITEMS ORDER SYSTEM
@@ -1223,7 +1389,7 @@
                     <div class="item-suggestions" id="suggestions-${itemId}"></div>
                     <div class="item-warning" id="warning-${itemId}">⚠️ Item not in stock - we'll check availability</div>
                 </div>
-                <button type="button" class="remove-item-btn" onclick="removeOrderItem(${itemId})">Remove</button>
+                <button type="button" class="remove-item-btn" onclick="removeOrderItem(${itemId})">×</button>
             `;
             
             itemsContainer.appendChild(itemDiv);
