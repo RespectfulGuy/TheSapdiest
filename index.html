@@ -244,12 +244,14 @@
         }
 
         .quote-text::first-letter {
-            font-size: 4rem;
-            font-weight: 700;
+            font-size: 4.5rem;
+            font-weight: 400;
+            font-style: italic;
             color: var(--accent);
             float: left;
-            line-height: 0.8;
-            margin: 0.1em 0.1em 0 0;
+            line-height: 0.75;
+            margin: 0.05em 0.15em 0 0;
+            font-family: 'Playfair Display', serif;
         }
 
         .quote-author {
@@ -508,9 +510,25 @@
         .items-container {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.15);
-            padding: 1.5rem;
             border-radius: 4px;
+            min-height: 60px;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow: hidden;
+        }
+
+        .items-container.empty {
+            min-height: 60px;
+        }
+
+        .items-container.has-items {
             min-height: 200px;
+            padding: 1.5rem 1.5rem 0.5rem;
+        }
+
+        #itemsList {
+            flex: 1;
         }
 
         .order-item {
@@ -519,6 +537,16 @@
             gap: 1rem;
             margin-bottom: 0.8rem;
             align-items: center;
+            opacity: 0;
+            transform: translateY(-10px);
+            animation: itemSlideIn 0.3s ease forwards;
+        }
+
+        @keyframes itemSlideIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .order-item input[type="number"] {
@@ -616,19 +644,24 @@
         .add-item-btn {
             background: transparent;
             border: none;
-            color: rgba(255, 255, 255, 0.4);
+            color: rgba(255, 255, 255, 0.5);
             cursor: pointer;
             font-size: 0.85rem;
-            padding: 0.8rem;
+            padding: 1rem;
             text-align: center;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             font-family: 'Work Sans', sans-serif;
             width: 100%;
-            margin-top: 0.5rem;
+            align-self: center;
         }
 
         .add-item-btn:hover {
             color: var(--accent);
+        }
+
+        .items-container.has-items .add-item-btn {
+            padding: 0.5rem;
+            font-size: 0.75rem;
         }
 
         .submit-button {
@@ -1325,22 +1358,24 @@
         // Reload products every 10 seconds to catch admin updates
         setInterval(loadProducts, 10000);
 
-        // Load and display active quote
+        // Load and display random quote from library
         function loadQuote() {
             const quotes = JSON.parse(localStorage.getItem('atelier_quotes') || '[]');
-            const activeQuote = quotes.find(q => q.active);
             
             const quoteContainer = document.getElementById('quoteContainer');
             
             if (!quoteContainer) return;
             
-            if (activeQuote) {
+            if (quotes.length > 0) {
+                // Pick random quote from library
+                const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+                
                 quoteContainer.innerHTML = `
-                    <p class="quote-text">${activeQuote.text}</p>
-                    <p class="quote-author">— ${activeQuote.author}</p>
+                    <p class="quote-text">${randomQuote.text}</p>
+                    <p class="quote-author">— ${randomQuote.author}</p>
                 `;
             } else {
-                // Default quote if none active
+                // Default quote if library is empty
                 quoteContainer.innerHTML = `
                     <p class="quote-text">Architecture is the learned game, correct and magnificent, of forms assembled in the light.</p>
                     <p class="quote-author">— Le Corbusier</p>
@@ -1348,8 +1383,8 @@
             }
         }
 
-        // Reload quote every 30 seconds to catch admin updates
-        setInterval(loadQuote, 30000);
+        // Change quote every 10 seconds for variety
+        setInterval(loadQuote, 10000);
 
         // ============================================
         // MULTIPLE ITEMS ORDER SYSTEM
@@ -1360,11 +1395,18 @@
 
         function addOrderItem() {
             const itemId = itemCounter++;
-            const itemsContainer = document.getElementById('itemsList');
+            const itemsContainer = document.querySelector('.items-container');
+            const itemsList = document.getElementById('itemsList');
             
-            if (!itemsContainer) {
+            if (!itemsList) {
                 console.error('itemsList container not found!');
                 return;
+            }
+            
+            // Expand container if this is first item
+            if (itemsList.children.length === 0) {
+                itemsContainer.classList.remove('empty');
+                itemsContainer.classList.add('has-items');
             }
             
             const itemDiv = document.createElement('div');
@@ -1392,18 +1434,19 @@
                 <button type="button" class="remove-item-btn" onclick="removeOrderItem(${itemId})">×</button>
             `;
             
-            itemsContainer.appendChild(itemDiv);
+            itemsList.appendChild(itemDiv);
             
             // Setup autocomplete
             setupAutocomplete(itemId);
         }
 
-        // Add first item when DOM is ready
+        // Don't add item on page load - start with empty container
         document.addEventListener('DOMContentLoaded', function() {
-            // Wait a moment for everything to settle
-            setTimeout(() => {
-                addOrderItem();
-            }, 100);
+            // Just make sure container has empty class
+            const itemsContainer = document.querySelector('.items-container');
+            if (itemsContainer) {
+                itemsContainer.classList.add('empty');
+            }
         });
 
         function removeOrderItem(itemId) {
@@ -1412,10 +1455,14 @@
                 itemDiv.remove();
             }
             
-            // Make sure at least one item remains
+            // Check if container is now empty
             const itemsList = document.getElementById('itemsList');
-            if (itemsList && itemsList.children.length === 0) {
-                addOrderItem();
+            const itemsContainer = document.querySelector('.items-container');
+            
+            if (itemsList && itemsContainer && itemsList.children.length === 0) {
+                // Collapse container back to empty state
+                itemsContainer.classList.remove('has-items');
+                itemsContainer.classList.add('empty');
             }
         }
 
