@@ -15,6 +15,7 @@ class AtelierDB {
         if (!localStorage.getItem('atelier_users')) {
             const defaultUsers = [
                 { id: 1, username: 'admin', password: 'atelier2026', role: 'admin', name: 'Admin User', createdAt: new Date().toISOString() },
+                { id: 2, username: 'staff', password: 'staff123', role: 'staff', name: 'Staff Member', createdAt: new Date().toISOString() }
             ];
             this.saveData('users', defaultUsers);
         }
@@ -73,6 +74,33 @@ class AtelierDB {
 
         if (!localStorage.getItem('atelier_customers')) {
             this.saveData('customers', []);
+        }
+
+        if (!localStorage.getItem('atelier_quotes')) {
+            const defaultQuotes = [
+                {
+                    id: 1,
+                    text: "Architecture is the learned game, correct and magnificent, of forms assembled in the light.",
+                    author: "Le Corbusier",
+                    active: true,
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    id: 2,
+                    text: "Form follows function.",
+                    author: "Louis Sullivan",
+                    active: false,
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    id: 3,
+                    text: "Less is more.",
+                    author: "Ludwig Mies van der Rohe",
+                    active: false,
+                    createdAt: new Date().toISOString()
+                }
+            ];
+            this.saveData('quotes', defaultQuotes);
         }
     }
 
@@ -182,6 +210,9 @@ function loadSectionData(section) {
             break;
         case 'analytics':
             loadAnalytics();
+            break;
+        case 'quotes':
+            loadQuotesTable();
             break;
         case 'users':
             loadUsersTable();
@@ -928,4 +959,165 @@ function deleteUser(userId) {
     users = users.filter(u => u.id !== userId);
     db.saveData('users', users);
     loadUsersTable();
+}
+
+// ============================================
+// QUOTE MANAGEMENT
+// ============================================
+
+function loadQuotesTable() {
+    const quotes = db.getData('quotes') || [];
+    
+    let html = '<table class="data-table"><thead><tr>';
+    html += '<th>ID</th><th>Quote</th><th>Author</th><th>Status</th><th>Actions</th>';
+    html += '</tr></thead><tbody>';
+    
+    quotes.forEach(quote => {
+        const statusBadge = quote.active 
+            ? '<span class="status-badge status-ready">ACTIVE</span>'
+            : '<span class="status-badge status-pending">INACTIVE</span>';
+        
+        html += `<tr>
+            <td>${quote.id}</td>
+            <td style="max-width: 400px;">${quote.text}</td>
+            <td>${quote.author}</td>
+            <td>${statusBadge}</td>
+            <td>
+                <button class="action-btn" onclick="editQuote(${quote.id})">Edit</button>
+                <button class="action-btn ${quote.active ? '' : 'primary'}" onclick="toggleQuote(${quote.id})">${quote.active ? 'Deactivate' : 'Activate'}</button>
+                <button class="action-btn danger" onclick="deleteQuote(${quote.id})">Delete</button>
+            </td>
+        </tr>`;
+    });
+    
+    html += '</tbody></table>';
+    document.getElementById('quotesTable').innerHTML = html;
+}
+
+function openAddQuoteModal() {
+    document.getElementById('quoteModalTitle').textContent = 'Add New Quote';
+    
+    let html = `
+        <form id="quoteFormElement" onsubmit="saveQuote(event)">
+            <div class="form-group">
+                <label>Quote Text</label>
+                <textarea class="input-field" id="quoteText" rows="4" required></textarea>
+            </div>
+            <div class="form-group">
+                <label>Author</label>
+                <input type="text" class="input-field" id="quoteAuthor" required>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="quoteActive" style="width: auto; margin-right: 0.5rem;">
+                    Set as active quote
+                </label>
+            </div>
+            <button type="submit" class="action-btn primary" style="width: 100%;">Add Quote</button>
+        </form>
+    `;
+    
+    document.getElementById('quoteForm').innerHTML = html;
+    document.getElementById('quoteModal').classList.add('active');
+}
+
+function editQuote(quoteId) {
+    const quotes = db.getData('quotes');
+    const quote = quotes.find(q => q.id === quoteId);
+    
+    if (!quote) return;
+    
+    document.getElementById('quoteModalTitle').textContent = 'Edit Quote';
+    
+    let html = `
+        <form id="quoteFormElement" onsubmit="saveQuote(event, ${quoteId})">
+            <div class="form-group">
+                <label>Quote Text</label>
+                <textarea class="input-field" id="quoteText" rows="4" required>${quote.text}</textarea>
+            </div>
+            <div class="form-group">
+                <label>Author</label>
+                <input type="text" class="input-field" id="quoteAuthor" value="${quote.author}" required>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="quoteActive" ${quote.active ? 'checked' : ''} style="width: auto; margin-right: 0.5rem;">
+                    Set as active quote
+                </label>
+            </div>
+            <button type="submit" class="action-btn primary" style="width: 100%;">Save Changes</button>
+        </form>
+    `;
+    
+    document.getElementById('quoteForm').innerHTML = html;
+    document.getElementById('quoteModal').classList.add('active');
+}
+
+function saveQuote(event, quoteId = null) {
+    event.preventDefault();
+    
+    const quotes = db.getData('quotes');
+    const text = document.getElementById('quoteText').value;
+    const author = document.getElementById('quoteAuthor').value;
+    const active = document.getElementById('quoteActive').checked;
+    
+    // If setting as active, deactivate all others
+    if (active) {
+        quotes.forEach(q => q.active = false);
+    }
+    
+    if (quoteId) {
+        // Update existing quote
+        const index = quotes.findIndex(q => q.id === quoteId);
+        quotes[index] = { 
+            ...quotes[index], 
+            text, 
+            author, 
+            active,
+            updatedAt: new Date().toISOString() 
+        };
+    } else {
+        // Add new quote
+        const newQuote = {
+            id: db.generateId('quotes'),
+            text,
+            author,
+            active,
+            createdAt: new Date().toISOString()
+        };
+        quotes.push(newQuote);
+    }
+    
+    db.saveData('quotes', quotes);
+    closeModal('quoteModal');
+    loadQuotesTable();
+}
+
+function toggleQuote(quoteId) {
+    const quotes = db.getData('quotes');
+    const quote = quotes.find(q => q.id === quoteId);
+    
+    if (!quote) return;
+    
+    // If activating, deactivate all others
+    if (!quote.active) {
+        quotes.forEach(q => q.active = false);
+    }
+    
+    quote.active = !quote.active;
+    quote.updatedAt = new Date().toISOString();
+    
+    db.saveData('quotes', quotes);
+    loadQuotesTable();
+}
+
+function deleteQuote(quoteId) {
+    if (!confirm('Are you sure you want to delete this quote?')) {
+        return;
+    }
+    
+    let quotes = db.getData('quotes');
+    quotes = quotes.filter(q => q.id !== quoteId);
+    db.saveData('quotes', quotes);
+    loadQuotesTable();
 }
