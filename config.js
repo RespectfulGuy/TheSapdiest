@@ -5,15 +5,15 @@
 
 const GITHUB_CONFIG = {
     // Your GitHub username
-    owner: 'YOUR_GITHUB_USERNAME',
+    owner: 'RespectfulGuy',
     
     // Your repository name
-    repo: 'YOUR_REPO_NAME',
+    repo: 'TheSapdiest',
     
     // Your GitHub Personal Access Token
     // Generate at: https://github.com/settings/tokens
     // Required scopes: 'repo' (Full control of private repositories)
-    token: 'YOUR_GITHUB_TOKEN',
+    token: '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',
     
     // Path to registry file in your repo
     registryPath: 'registry.json',
