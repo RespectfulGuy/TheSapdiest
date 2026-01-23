@@ -226,11 +226,21 @@
         .dashboard.active ~ .scan-line,
         .dashboard.active ~ .glitch-text,
         .dashboard.active ~ .glitch-text-2 {
-            display: none;
+            display: none !important;
         }
 
         body:has(.dashboard.active)::before {
+            display: none !important;
+        }
+
+        /* Only show scan line when login is visible */
+        .scan-line {
             display: none;
+        }
+
+        .login-container:not([style*="display: none"]) ~ .scan-line,
+        body:has(.login-container:not([style*="display: none"])) .scan-line {
+            display: block;
         }
 
         /* Sidebar */
@@ -640,6 +650,7 @@ ACCESS.PROTOCOL: ENGAGED</div>
                 <li class="nav-item" data-section="inventory">📋 Inventory</li>
                 <li class="nav-item" data-section="customers">👥 Customers</li>
                 <li class="nav-item" data-section="analytics">📈 Analytics</li>
+                <li class="nav-item" data-section="quotes">💬 Quotes</li>
                 <li class="nav-item hidden-nav" id="userManagementNav" data-section="users" style="display: none;">🔐 Users</li>
             </ul>
             <button class="logout-btn" onclick="logout()">Logout</button>
@@ -759,6 +770,20 @@ ACCESS.PROTOCOL: ENGAGED</div>
                 </div>
             </section>
 
+            <!-- Quotes Section -->
+            <section class="section" id="quotes">
+                <div class="section-header">
+                    <h1>💬 Quote Management</h1>
+                    <p>Manage inspirational quotes displayed on the store</p>
+                </div>
+
+                <button class="action-btn primary" onclick="openAddQuoteModal()" style="margin-bottom: 1.5rem;">
+                    + Add New Quote
+                </button>
+
+                <div id="quotesTable"></div>
+            </section>
+
             <!-- User Management Section (Hidden by default) -->
             <section class="section" id="users">
                 <div class="section-header">
@@ -805,6 +830,17 @@ ACCESS.PROTOCOL: ENGAGED</div>
                 <button class="close-modal" onclick="closeModal('userModal')">×</button>
             </div>
             <div id="userForm"></div>
+        </div>
+    </div>
+
+    <!-- Quote Management Modal -->
+    <div class="modal" id="quoteModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="quoteModalTitle">Add Quote</h2>
+                <button class="close-modal" onclick="closeModal('quoteModal')">×</button>
+            </div>
+            <div id="quoteForm"></div>
         </div>
     </div>
 
