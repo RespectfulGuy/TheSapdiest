@@ -1,0 +1,40 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "username": "admin",
+      "password": "YXRlbGllcjIwMjY=",
+      "role": "admin",
+      "name": "Admin User",
+      "createdAt": "2026-01-23T00:00:00.000Z"
+    }
+  ],
+  "products": [],
+  "orders": [],
+  "customers": [],
+  "quotes": [
+    {
+      "id": 1,
+      "text": "Architecture is the learned game, correct and magnificent, of forms assembled in the light.",
+      "author": "Le Corbusier",
+      "createdAt": "2026-01-23T00:00:00.000Z"
+    },
+    {
+      "id": 2,
+      "text": "Form follows function.",
+      "author": "Louis Sullivan",
+      "createdAt": "2026-01-23T00:00:00.000Z"
+    },
+    {
+      "id": 3,
+      "text": "Less is more.",
+      "author": "Ludwig Mies van der Rohe",
+      "createdAt": "2026-01-23T00:00:00.000Z"
+    }
+  ],
+  "_metadata": {
+    "lastUpdated": "2026-01-23T00:00:00.000Z",
+    "version": "1.0",
+    "note": "Password is Base64 encoded. Default admin password: atelier2026"
+  }
+}

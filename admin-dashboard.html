@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATELIER Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0f0f0f;
+            --bg-secondary: #1a1a1a;
+            --bg-tertiary: #252525;
+            --accent: #00ff88;
+            --accent-dim: #00ff8820;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --border: #2a2a2a;
+            --danger: #ff4444;
+            --warning: #ffaa00;
+            --success: #00ff88;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Glitchy background elements */
+        body::before {
+            content: 'ERROR 504';
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 20rem;
+            font-weight: 900;
+            font-family: 'JetBrains Mono', monospace;
+            color: rgba(0, 255, 136, 0.03);
+            z-index: 0;
+            pointer-events: none;
+            letter-spacing: 0.5em;
+            animation: glitchFloat 20s ease-in-out infinite;
+        }
+
+        @keyframes glitchFloat {
+            0%, 100% { 
+                transform: translate(-50%, -50%) rotate(-45deg); 
+                opacity: 0.03;
+            }
+            50% { 
+                transform: translate(-48%, -52%) rotate(-46deg); 
+                opacity: 0.05;
+            }
+        }
+
+        /* Glitchy text overlay */
+        .glitch-text {
+            position: fixed;
+            top: 20%;
+            left: 10%;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: rgba(255, 68, 68, 0.3);
+            z-index: 0;
+            pointer-events: none;
+            white-space: pre;
+            opacity: 0.3;
+        }
+
+        .glitch-text-2 {
+            position: fixed;
+            bottom: 30%;
+            right: 15%;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: rgba(0, 255, 136, 0.2);
+            z-index: 0;
+            pointer-events: none;
+            white-space: pre;
+            opacity: 0.2;
+        }
+
+        /* Scan line effect */
+        .scan-line {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(0, 255, 136, 0.5), 
+                transparent
+            );
+            z-index: 0;
+            animation: scan 8s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes scan {
+            0% { top: 0%; }
+            100% { top: 100%; }
+        }
+
+        /* Login Screen */
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .login-box {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 3rem;
+            max-width: 400px;
+            width: 100%;
+            animation: slideUp 0.4s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-box h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            color: var(--accent);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .login-box p {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: var(--bg-primary);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 1rem;
+            background: var(--accent);
+            color: var(--bg-primary);
+            border: none;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .login-btn:hover {
+            background: #00dd77;
+            transform: translateY(-2px);
+        }
+
+        .error-message {
+            background: rgba(255, 68, 68, 0.1);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        /* Dashboard Layout */
+        .dashboard {
+            display: none;
+            min-height: 100vh;
+        }
+
+        .dashboard.active {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+        }
+
+        /* Hide glitch effects when dashboard is active */
+        .dashboard.active ~ .glitch-robot,
+        .dashboard.active ~ .scan-line,
+        .dashboard.active ~ .glitch-text,
+        .dashboard.active ~ .glitch-text-2 {
+            display: none !important;
+        }
+
+        body:has(.dashboard.active)::before {
+            display: none !important;
+        }
+
+        /* Only show scan line when login is visible */
+        .scan-line {
+            display: none;
+        }
+
+        .login-container:not([style*="display: none"]) ~ .scan-line,
+        body:has(.login-container:not([style*="display: none"])) .scan-line {
+            display: block;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border);
+            padding: 2rem 0;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem 2rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h2 {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent);
+            font-size: 1.2rem;
+        }
+
+        .sidebar-header .user-info {
+            margin-top: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            padding: 0.8rem 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            border-left-color: var(--accent);
+            background: var(--bg-tertiary);
+            color: var(--accent);
+        }
+
+        .logout-btn {
+            margin: 2rem 1.5rem 0;
+            padding: 0.8rem;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            cursor: pointer;
+            width: calc(100% - 3rem);
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .logout-btn:hover {
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 2rem;
+            overflow-y: auto;
+            height: 100vh;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .section-header {
+            margin-bottom: 2rem;
+        }
+
+        .section-header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-header p {
+            color: var(--text-secondary);
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .stat-change {
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            color: var(--success);
+        }
+
+        .stat-change.negative {
+            color: var(--danger);
+        }
+
+        /* Tables */
+        .data-table {
+            width: 100%;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-collapse: collapse;
+        }
+
+        .data-table thead {
+            background: var(--bg-tertiary);
+        }
+
+        .data-table th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .data-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .data-table tbody tr {
+            transition: background 0.2s ease;
+        }
+
+        .data-table tbody tr:hover {
+            background: var(--bg-tertiary);
+        }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 2px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-pending {
+            background: rgba(255, 170, 0, 0.2);
+            color: var(--warning);
+        }
+
+        .status-ready {
+            background: rgba(0, 255, 136, 0.2);
+            color: var(--success);
+        }
+
+        .status-completed {
+            background: rgba(160, 160, 160, 0.2);
+            color: var(--text-secondary);
+        }
+
+        .status-low {
+            background: rgba(255, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .status-in-stock {
+            background: rgba(0, 255, 136, 0.2);
+            color: var(--success);
+        }
+
+        /* Action Buttons */
+        .action-btn {
+            padding: 0.5rem 1rem;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            margin-right: 0.5rem;
+        }
+
+        .action-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .action-btn.primary {
+            background: var(--accent);
+            color: var(--bg-primary);
+            border-color: var(--accent);
+        }
+
+        .action-btn.primary:hover {
+            background: #00dd77;
+        }
+
+        .action-btn.danger {
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .action-btn.danger:hover {
+            background: var(--danger);
+            color: var(--text-primary);
+        }
+
+        /* Forms */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 0.8rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        select.input-field {
+            cursor: pointer;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h2 {
+            font-size: 1.5rem;
+            color: var(--accent);
+        }
+
+        .close-modal {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+        }
+
+        .close-modal:hover {
+            color: var(--text-primary);
+        }
+
+        /* Charts placeholder */
+        .chart-container {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .dashboard.active {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Glitchy background elements -->
+    <div class="scan-line"></div>
+    <div class="glitch-text">ERR: Connection timeout
+net::ERR_CONNECTION_TIMED_OUT
+Attempting reconnect...</div>
+    <div class="glitch-text-2">SYSTEM.STATUS: OPERATIONAL
+SECURITY.LEVEL: MAXIMUM
+ACCESS.PROTOCOL: ENGAGED</div>
+
+    <!-- Login Screen -->
+    <div class="login-container" id="loginContainer">
+        <div class="login-box">
+            <h1>ATELIER ADMIN</h1>
+            <p>Staff Dashboard Access</p>
+            <div class="error-message" id="loginError">Invalid credentials</div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit" class="login-btn">ACCESS DASHBOARD</button>
+            </form>
+            <a href="index.html" style="display: block; text-align: center; margin-top: 1.5rem; color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; transition: color 0.3s ease;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-secondary)'">← Back to Store</a>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="dashboard" id="dashboard">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>ATELIER</h2>
+                <div class="user-info" id="currentUser">Admin User</div>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item active" data-section="overview">📊 Overview</li>
+                <li class="nav-item" data-section="orders">📦 Orders</li>
+                <li class="nav-item" data-section="inventory">📋 Inventory</li>
+                <li class="nav-item" data-section="customers">👥 Customers</li>
+                <li class="nav-item" data-section="analytics">📈 Analytics</li>
+                <li class="nav-item" data-section="quotes">💬 Quotes</li>
+                <li class="nav-item hidden-nav" id="userManagementNav" data-section="users" style="display: none;">🔐 Users</li>
+            </ul>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+            
+            <!-- Secret access trigger - triple click the logout button while holding Shift -->
+            <div style="margin-top: 1rem; text-align: center;">
+                <span style="font-size: 0.7rem; color: var(--text-secondary); opacity: 0.3;" id="secretTrigger">v1.0</span>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <!-- Overview Section -->
+            <section class="section active" id="overview">
+                <div class="section-header">
+                    <h1>Dashboard Overview</h1>
+                    <p>Real-time business metrics and recent activity</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Total Orders</div>
+                        <div class="stat-value" id="totalOrders">0</div>
+                        <div class="stat-change">+12% this week</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Pending Orders</div>
+                        <div class="stat-value" id="pendingOrders">0</div>
+                        <div class="stat-change">2 require attention</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Low Stock Items</div>
+                        <div class="stat-value" id="lowStock">0</div>
+                        <div class="stat-change negative">Restock needed</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Revenue (This Month)</div>
+                        <div class="stat-value">—</div>
+                        <div class="stat-change">Track when pricing added</div>
+                    </div>
+                </div>
+
+                <h2 style="margin-bottom: 1rem;">Recent Orders</h2>
+                <div id="recentOrdersTable"></div>
+            </section>
+
+            <!-- Orders Section -->
+            <section class="section" id="orders">
+                <div class="section-header">
+                    <h1>Order Management</h1>
+                    <p>View and manage all customer orders</p>
+                </div>
+
+                <div style="margin-bottom: 1.5rem;">
+                    <select class="input-field" style="max-width: 200px;" id="orderFilter">
+                        <option value="all">All Orders</option>
+                        <option value="pending">Pending</option>
+                        <option value="ready">Ready for Pickup</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                </div>
+
+                <div id="ordersTable"></div>
+            </section>
+
+            <!-- Inventory Section -->
+            <section class="section" id="inventory">
+                <div class="section-header">
+                    <h1>Inventory Management</h1>
+                    <p>Track and update stock levels</p>
+                </div>
+
+                <button class="action-btn primary" onclick="openAddProductModal()" style="margin-bottom: 1.5rem;">
+                    + Add New Product
+                </button>
+
+                <div id="inventoryTable"></div>
+            </section>
+
+            <!-- Customers Section -->
+            <section class="section" id="customers">
+                <div class="section-header">
+                    <h1>Customer Directory</h1>
+                    <p>View customer information and order history</p>
+                </div>
+
+                <div id="customersTable"></div>
+            </section>
+
+            <!-- Analytics Section -->
+            <section class="section" id="analytics">
+                <div class="section-header">
+                    <h1>Analytics & Reports</h1>
+                    <p>Business insights and trends</p>
+                </div>
+
+                <div class="chart-container">
+                    <p>Chart visualization placeholder - Orders over time</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Most Popular Product</div>
+                        <div class="stat-value" style="font-size: 1.5rem;" id="topProduct">—</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Avg Order Size</div>
+                        <div class="stat-value" id="avgOrderSize">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Total Customers</div>
+                        <div class="stat-value" id="totalCustomers">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Fulfillment Rate</div>
+                        <div class="stat-value" id="fulfillmentRate">0%</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quotes Section -->
+            <section class="section" id="quotes">
+                <div class="section-header">
+                    <h1>💬 Quote Management</h1>
+                    <p>Manage inspirational quotes displayed on the store</p>
+                </div>
+
+                <button class="action-btn primary" onclick="openAddQuoteModal()" style="margin-bottom: 1.5rem;">
+                    + Add New Quote
+                </button>
+
+                <div id="quotesTable"></div>
+            </section>
+
+            <!-- User Management Section (Hidden by default) -->
+            <section class="section" id="users">
+                <div class="section-header">
+                    <h1>🔐 User Management</h1>
+                    <p>Manage admin and staff accounts</p>
+                </div>
+
+                <button class="action-btn primary" onclick="openAddUserModal()" style="margin-bottom: 1.5rem;">
+                    + Add New User
+                </button>
+
+                <div id="usersTable"></div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Order Details Modal -->
+    <div class="modal" id="orderModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Order Details</h2>
+                <button class="close-modal" onclick="closeModal('orderModal')">×</button>
+            </div>
+            <div id="orderDetails"></div>
+        </div>
+    </div>
+
+    <!-- Edit Inventory Modal -->
+    <div class="modal" id="inventoryModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="inventoryModalTitle">Edit Product</h2>
+                <button class="close-modal" onclick="closeModal('inventoryModal')">×</button>
+            </div>
+            <div id="inventoryForm"></div>
+        </div>
+    </div>
+
+    <!-- User Management Modal -->
+    <div class="modal" id="userModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="userModalTitle">Add User</h2>
+                <button class="close-modal" onclick="closeModal('userModal')">×</button>
+            </div>
+            <div id="userForm"></div>
+        </div>
+    </div>
+
+    <!-- Quote Management Modal -->
+    <div class="modal" id="quoteModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="quoteModalTitle">Add Quote</h2>
+                <button class="close-modal" onclick="closeModal('quoteModal')">×</button>
+            </div>
+            <div id="quoteForm"></div>
+        </div>
+    </div>
+
+    <script src="admin-backend.js"></script>
+</body>
+</html>
